@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
@@ -27,8 +28,8 @@ public class SenderApplication {
 	Sender senderMessage;
 	*/
 
-	@PostMapping(value = "/notification/{message}")
-	public ResponseEntity<String> send(@PathVariable String message) {
+	@PostMapping(value = "/notification")
+	public ResponseEntity<String> send(@RequestBody String message) {
 		log.info("Message received: " + message);
 		// senderMessage.sendMessage(message);
 		return new ResponseEntity<>("Message received.", HttpStatus.OK);

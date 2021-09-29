@@ -28,7 +28,7 @@ public class ProxyCameriereController {
     @PostMapping (value = "/register/{url}")
     public ResponseEntity<String> registerUrl (@PathVariable String url) {
         log.info("URL registered: " + url);
-        receiver.webh.addUrl(url);
+        receiver.webhook.addUrl(url);
         return new ResponseEntity<>("URL registered", HttpStatus.OK);
     }
 

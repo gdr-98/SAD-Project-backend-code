@@ -2,11 +2,9 @@ package com.project.ProxyCameriere;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import org.springframework.jms.annotation.EnableJms;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Service;
 
@@ -20,26 +18,18 @@ import javax.jms.MessageListener;
  */
 
 @Service
+@EnableJms
 public class ReceiverJMS implements MessageListener {
 
-    public Webhook webh = new Webhook();
+    public Webhook webhook = new Webhook();
 
-    private Post poster = new Post();
+    private final Post poster = new Post();
 
     private final Logger log = LoggerFactory.getLogger(ReceiverJMS.class);
 
     @JmsListener(destination = "CodaCamerieriBroker")
     @Override
     public void onMessage(Message message) {
-
-        /*
-        String notifica = "";
-        try {
-            notifica = (String) message.getBody(Object.class);
-        } catch (JMSException ex) {
-            ex.printStackTrace();
-        }
-        */
 
         String notifica = "";
         try {
@@ -49,11 +39,11 @@ public class ReceiverJMS implements MessageListener {
         }
 
         log.info("Event received: " + notifica);
-        HttpStatus status;
-        for (String temp : webh.urls) {
+        poster.createPost(("http://" + webhook.urls.get(0) + "/notification"), notifica);
+        for (String temp : webhook.urls) {
             // 127.0.0.1:8081
-            status = poster.createPost(("http://" + temp + "/notification/" + notifica), "").getStatusCode();
         }
+
         /*
         HttpURLConnection connection = null;
         String notifica = "";
