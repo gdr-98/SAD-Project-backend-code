@@ -28,9 +28,10 @@ public class SenderApplication {
 	*/
 
 	@PostMapping(value = "/notification/{message}")
-	public void send(@PathVariable String message) {
+	public ResponseEntity<String> send(@PathVariable String message) {
 		log.info("Message received: " + message);
 		// senderMessage.sendMessage(message);
+		return new ResponseEntity<>("Message received.", HttpStatus.OK);
 	}
 
 }
