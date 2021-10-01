@@ -17,6 +17,14 @@ import RestaurantArea.Order.OrderStates;
 
 public class RestaurantController {
 	
+	public enum returnCodes{
+		
+		tableNotFound,
+		orderNotCreated,
+		orderNotFound,
+		itemsNotAdded;
+	}
+	
 	private List<Table> tables=new ArrayList<>();
 	private List<Order> orders=new ArrayList<>();
 	private RestaurantDAO db;
@@ -229,11 +237,10 @@ public class RestaurantController {
 		Optional<Table> t=this.getTable(tableID, roomNumber);
 		Table to_free;
 		if(t.isEmpty())
-			return "TableNotFound";
+			return returnCodes.tableNotFound.name();
 		else {
 			to_free=t.get();
 			to_free.free();
-			//db.updateTableByJSON(to_free.getJSONRepresentation(Optional.empty()));
 			return to_free.getStateString();
 		}
 
@@ -244,13 +251,13 @@ public class RestaurantController {
 	 * @info: set i waiting for orders a specific table
 	 * @param tableID
 	 * @param roomNumber
-	 * @return TableNotFound if the table doesn't exists else the new state of the table
+	 * @return tableNotFound if the table doesn't exists else the new state of the table
 	 */
 	public String setTableWaiting(String tableID,int roomNumber) {
 		Optional<Table> t=this.getTable(tableID, roomNumber);
 		Table table;
 		if(t.isEmpty())
-			return "TableNotFound";
+			return returnCodes.tableNotFound.name();
 		else {
 			table=t.get();
 			table.setInWaitingForOrders();
@@ -269,16 +276,16 @@ public class RestaurantController {
 	 * @param userID creator
 	 * @return orderNotCreated or tableNotFound, else the JSONRepresenntationn of the order
 	 */
-	public String generateOrderFromTable(List<String>itemNames,List<List<String>> additive,List<List<String>>toSub,
+	public String generateOrderForTable(List<String>itemNames,List<List<String>> additive,List<List<String>>toSub,
 			
 			List<Integer> priority,String tableID,int tableRoomNumber,Integer userID){
-		String toRet ="tableNotFound";
+		String toRet =returnCodes.tableNotFound.name();
 		Optional<Order> newOrder;
 		for(Table t:this.tables) {
 			if(t.isMe(tableID, tableRoomNumber)) {
 				newOrder=t.addOrder(itemNames, additive, toSub, priority, userID);
 				if(newOrder.isEmpty())
-					toRet="orderNotCreated";
+					toRet=returnCodes.orderNotCreated.name();
 				else
 					toRet=newOrder.get().getJSONRepresentation(Optional.empty());
 			}
@@ -355,7 +362,7 @@ public class RestaurantController {
 		Optional<Table> t=this.getTable(tableID, roomNumber);
 		Table table;
 		if(t.isEmpty())
-			return "tableNotFound";
+			return returnCodes.tableNotFound.name();
 		else {
 			table=t.get();
 			table.reserve();
@@ -363,9 +370,80 @@ public class RestaurantController {
 		}
 	}
 	
+	/**
+	 * 
+	 * @info: adds an ordered item to an order
+	 * @param orderID id of the order 
+	 * @param names list of menuItem names
+	 * @param additive goods for item
+	 * @param toSub goods for item
+	 * @param priority priority of items
+	 * @return JSON representation of the order, else the specific error code
+	 */
+	public String addItemToOrder(int orderID,List<String>names,List<List<String>> additive,List<List<String>>toSub,
+	List<Integer> priority) {
+		Order toMod=null;
+		boolean check=false;
+		for(Order o:this.orders) {
+			if (o.isMe(orderID))
+				toMod=o;
+		}
+		if(toMod==null) {
+			return returnCodes.orderNotFound.name();
+		}
+		check=toMod.addOrderedItems(names, additive, toSub, priority);
+		if(!check)
+			return	returnCodes.itemsNotAdded.name();
+		return toMod.getJSONRepresentation(Optional.empty());
+	}
 	
-
+	/**
+	 * @info delete an item from an order
+	 * @param orderID 
+	 * @param lineNumber
+	 * @return the json representation of the order else the specific error code
+	 */
+	public String deleteItemFromOrder(int orderID,int lineNumber) {
+		Order toMod=null;
+		boolean check=false;
+		for(Order o:this.orders) {
+			if (o.isMe(orderID))
+				toMod=o;
+		}
+		if(toMod==null) {
+			return returnCodes.orderNotFound.name();
+		}
+		check=toMod.cancelOrderedItem(lineNumber);
+		if(!check)
+			return	returnCodes.itemsNotAdded.name();
+		return toMod.getJSONRepresentation(Optional.empty());
+		
+	}
 	
+	/**
+	 * @info modify an item 
+	 * @param orderID 
+	 * @param lineNumber
+	 * @return the json representation of the order else the specific error code
+	 */
+	
+	public String modifyItemInOrder(int orderID,int lineNumber) {
+		Order toMod=null;
+		boolean check=false;
+		for(Order o:this.orders) {
+			if (o.isMe(orderID))
+				toMod=o;
+		}
+		if(toMod==null) {
+			return returnCodes.orderNotFound.name();
+		}
+	//	String=toMod.setAdditiveGoodsForItem(lineNumber);
+		
+		if(!check)
+			return	returnCodes.itemsNotAdded.name();
+		return toMod.getJSONRepresentation(Optional.empty());
+		
+	}
 	
 	
 	/******************************************************************

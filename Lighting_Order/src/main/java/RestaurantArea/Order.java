@@ -121,16 +121,20 @@ public class Order {
 	}
 	/**
 	 * 
-	 * @param 	to_add, the orderedItem to be added 
-	 * @return	true if the item is correctly added else false.
+	 * @param names of the items
+	 * @param additive goods for the items
+	 * @param toSub sub goods for the items
+	 * @param priority list
+	 * @return the list of raw ordered items
 	 */
-	public boolean addOrdedItem(OrderedItem to_add) { 
+	public  boolean addOrderedItems(List<String>names,List<List<String>> additive,List<List<String>>toSub,
+				List<Integer> priority) {
 		
 		if(this.orderState.equals(OrderStates.WaitingForWorking)) { //Only in this status
-			addOrdedItemRaw(to_add);
-			//Add the item in the database
-			this.associatedTable.get().getController().getDB().addOrderedItem(to_add.getJSONRepresentation(), 
-					this.orderID);
+			List<OrderedItem> toAdd=generateItemRaw(names, additive, toSub, priority);
+			//Should check the db ..
+			for(OrderedItem item:toAdd) 
+				addOrdedItemSingle(item);
 			return true;
 		}
 		return false;
@@ -138,14 +142,16 @@ public class Order {
 	
 	/**
 	 * 
-	 * @info same as addOrdered item, just doesn't make any call to the db
-	 * @additiveInfo: sure to call this function from constructor
+	 * @param 	to_add, the orderedItem to be added 
+	 * @return	true if the item is correctly added else false.
 	 */
-	public void addOrdedItemRaw(OrderedItem to_add) { 
+	private void addOrdedItemSingle(OrderedItem to_add) { 
 			to_add.setLineNumber(this.getGreatestLineNumber()+1); 
 			orderedItems.add(to_add);
+			//Add the item in the database
+			this.associatedTable.get().getController().getDB().addOrderedItem(to_add.getJSONRepresentation(), 
+					this.orderID);	
 	}
-	
 	/**
 	 * 
 	 * @return the nnumber of ordered items
@@ -268,7 +274,6 @@ public class Order {
 						this.associatedTable.get().getController().getDB(). //remove the item from the database
 						removeOrderedItem(this.orderID, lineNumber);
 					}
-					
 					return true;
 				}
 			}
@@ -469,10 +474,4 @@ public class Order {
 		}
 		return Optional.empty();
 	}
-	
-	/**
-	  * @info special function meant to be called only when obtaining an order from a json directly
-	 */
-	public void initItems() { this.orderedItems=new ArrayList<>();}
-	
 }

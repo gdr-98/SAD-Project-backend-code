@@ -310,19 +310,19 @@ public class RestaurantDAOPSQL implements RestaurantDAO {
 	@Override
 	public boolean removeOrderedItem(int orderedItemID, int orderedItemLineNumber) {
 		String delete_query = "DELETE FROM \"Restaurant\".\"ProdottoOrdinato\""
-				+ "	WHERE + 'ordine_id="+orderedItemID+"' AND 'linea_ordine="+orderedItemLineNumber+"'";
+				+ "	WHERE + ordine_id="+orderedItemID+" AND linea_ordine="+orderedItemLineNumber+"";
 		database.update(delete_query);
 		delete_query = "DELETE FROM \"Restaurant\".\"Merce_ProdottoOrdinato\""
-				+ "	WHERE + 'prodotto_ordinato_ordine_id="+orderedItemID+"' AND 'prodotto_ordinato_linea_ordine="+orderedItemLineNumber+"'";
+				+ "	WHERE + prodotto_ordinato_ordine_id="+orderedItemID+" AND prodotto_ordinato_linea_ordine="+orderedItemLineNumber+"";
 		database.update(delete_query);
-		String query = "SELECT * FROM \"Restaurant\".\"ProdottoOrdinato\" "
+		/*String query = "SELECT * FROM \"Restaurant\".\"ProdottoOrdinato\" "
 				+ "WHERE + 'prodotto_ordinato_ordine_id="+orderedItemID+"' AND 'prodotto_ordinato_linea_ordine="+orderedItemLineNumber+"'";
 		List<Map<String,Object>> results = database.queryForList(query);
 		if(results.size() == 0) {
 			delete_query = "DELETE FROM \"Restaurant\".\"Ordine\""
 					+ "	WHERE + 'id="+orderedItemID+"'";
 			database.update(delete_query);
-		}
+		}*/
 		return true;
 	}
 

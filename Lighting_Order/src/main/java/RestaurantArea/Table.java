@@ -216,10 +216,6 @@ public class Table {
 	 */
 	public boolean isInRoom(int roomNumber) {return this.tableRoomNumber==roomNumber;}
 	
-	/**
-	 * @info when obtaining the object  from json we need to re-init the orderslist
-	 */
-	public void initOrders() { this.orders=new ArrayList<>();}
 		
 	/**
 	 * 
