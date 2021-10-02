@@ -160,7 +160,7 @@ public class Order {
 	}
 	/**
 	 * 
-	 * @return the nnumber of ordered items
+	 * @return the number of ordered items
 	 */
 	public int numOfItems() { return this.orderedItems.size();}
 	

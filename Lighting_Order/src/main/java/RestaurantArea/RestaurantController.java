@@ -192,7 +192,7 @@ public class RestaurantController {
 	/**
 	 *
 	 * @param tableID id of the table to search
-	 * @param roomNumber room nnumber of the table to search
+	 * @param roomNumber room number of the table to search
 	 * @return Optional table if found else empty
 	 */
 	public Optional<Table> getTable(String tableID,int roomNumber){

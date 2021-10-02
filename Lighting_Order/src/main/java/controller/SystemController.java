@@ -2,8 +2,10 @@ package controller;
 
 import MenuAndWareHouseArea.MenuAndGoodsController;
 import RestaurantArea.RestaurantController;
-import RestaurantArea.TableState;
 import UsersData.UsersController;
+import messages.menuRequest;
+import messages.tableOperation;
+import messages.tableRequest;
 
 import java.util.Optional;
 
@@ -11,20 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
-
-
-
-import com.google.gson.JsonParser;
-import com.google.gson.annotations.Expose;
-import com.google.gson.JsonObject;
-
-import java.util.Map;
-import java.util.HashMap;
-
-import java.util.List;
-import java.util.ArrayList;
-
-
 
 /**
  * @info: the controller that the system uses
@@ -54,17 +42,6 @@ public class SystemController  extends GeneralController{
 		operationAborted;
 	}
 	
-	private class OrderParameters{
-		@Expose(serialize=true,   deserialize=true)
-		public List<String> itemNames;
-		@Expose(serialize=true, deserialize=true)
-		public List<List<String>> addGoods;
-		@Expose(serialize=true,deserialize=true)
-		public List<List<String>>subGoods;
-		@Expose(serialize=true,deserialize=true)
-		public List<Integer>  priority;
-	}
-
 	/**
 	 * @info Satisfy a menuRequest and publish the response to the broker
 	 * 	request:	{
@@ -81,22 +58,23 @@ public class SystemController  extends GeneralController{
 	 * 				}
 	 */
 	public void menuRequest(String request) {
-			JsonObject obj=JsonParser.parseString(request).getAsJsonObject();
+			Gson gson=new Gson();
+			menuRequest obj=gson.fromJson(request, menuRequest.class);
 			//checking the role of the request
 		
 			if(this.usersController.checkRole(
-					obj.get("user").getAsString()
+					obj.user
 					,UsersData.User.userRoles.Cameriere.name() ))
 			{
-				String response=this.controllerMenu.getMenuJSON(obj.get("areaVisualization").getAsBoolean(), obj.get("areaMenu").getAsString());
-				obj.addProperty("result", results.roleOk.name());
-				obj.add("response", JsonParser.parseString(response).getAsJsonArray());
+				obj.response=this.controllerMenu.getMenuJSON(obj.areaVisualization,
+						obj.areaMenu);
+				obj.result= results.roleOk.name();
+				
 			}
 			else {
-				obj.addProperty("result", results.roleFailed.name());
-				obj.addProperty("response", "[]");
+				obj.result=results.roleFailed.name();
 			}
-			this.brokerIface.publishResponse(obj.getAsString());
+			this.brokerIface.publishResponse(gson.toJson(obj,menuRequest.class));
 	}
 	
 	
@@ -118,36 +96,32 @@ public class SystemController  extends GeneralController{
 	 * 					}
 	 */
 	public void tableRequest(String request) {
-		
-		JsonObject obj=JsonParser.parseString(request).getAsJsonObject();
+		Gson gson=new Gson();
+		tableRequest obj=gson.fromJson(request,tableRequest.class);
 		//checking the role of the request
 	
 		if(this.usersController.checkRole(
-				obj.get("user").getAsString()
+				obj.user
 				,UsersData.User.userRoles.Accoglienza.name() )||
 				this.usersController.checkRole(
-						obj.get("user").getAsString()
+						obj.user
 						,UsersData.User.userRoles.Cameriere.name() ))
 		{
-			String response;
 			Optional<String> area=Optional.empty();
 			Optional<Integer> room=Optional.empty();
 			
-			if(obj.get("forRoom").getAsBoolean())
-				room=Optional.of(obj.get("roomNumber").getAsInt());
-			if(obj.get("showItemsInArea").getAsBoolean())
-				area=Optional.of(obj.get("orderArea").getAsString());
-			
-			response=this.controllerRestaurant.getAllTablesJSON(room, area);
-			
-			obj.addProperty("result", results.roleOk.name());
-			obj.add("response", JsonParser.parseString(response).getAsJsonArray());
+			if(obj.forRoom)
+				room=Optional.of(obj.roomNumber);
+			if(obj.showItemsInArea)
+				area=Optional.of(obj.orderArea);
+			obj.response=this.controllerRestaurant.getAllTablesJSON(room, area);
+			obj.result=results.roleOk.name();
+		
 		}
 		else {
-			obj.addProperty("result", results.roleFailed.name());
-			obj.addProperty("response", "[]");
+			obj.result=results.roleFailed.name();
 		}
-		this.brokerIface.publishResponse(obj.getAsString());
+		this.brokerIface.publishResponse(gson.toJson(obj,tableRequest.class));
 	}
 	
 	
@@ -164,38 +138,28 @@ public class SystemController  extends GeneralController{
 	 * 				}
 	 * 	response:	{
 	 * 					request
-	 * 					result: "roleFailed/roleOk/operationCompleted/operationAborted"
+	 * 					result: "roleFailed/roleOk"
 	 * 					response:tableJsonRepresentation
 	 * 				}
 	 */
-	public void userWaitingForOrderRequest(String Request) {
-		JsonObject obj=JsonParser.parseString(Request).getAsJsonObject();
-		String tableID=obj.get("tableID").getAsString();
-		int tableRoomNumber=obj.get("tableRoomNumber").getAsInt();
+	public void userWaitingForOrderRequest(String request) {
+		Gson gson=new Gson();
+		tableOperation obj=gson.fromJson(request, tableOperation.class);
 		if(this.usersController.checkRole(
-				obj.get("user").getAsString()
+				obj.user
 				,UsersData.User.userRoles.Accoglienza.name()))
 		{
-			String response=this.controllerRestaurant.setTableWaiting(
-							tableID,
-							tableRoomNumber);
+			obj.response=this.controllerRestaurant.setTableWaiting(
+							obj.tableID,
+							obj.tableRoomNumber);
 			
-			if(response.equals(TableState.StatesList.waitingForOrders.name())) 
-				obj.addProperty("result",results.operationCompleted.name());
-			else 
-				obj.addProperty("result", results.operationAborted.name());
-			
-			obj.addProperty("response", 
-					this.controllerRestaurant.getTableJSON(tableID, tableRoomNumber,Optional.empty())
-					);
-		
+			obj.result=results.roleOk.name();
 		}
 		else 
 		{
-			obj.addProperty("result", results.roleFailed.name());
-			obj.addProperty("response", "{}");
+			obj.result= results.roleFailed.name();
 		}
-		this.brokerIface.publishResponse(obj.getAsString());
+		this.brokerIface.publishResponse(gson.toJson(obj,tableOperation.class));
 	}
 	
 	/**
@@ -211,37 +175,28 @@ public class SystemController  extends GeneralController{
 	 * 				}
 	 * 	response:	{
 	 * 					request
-	 * 					result: "roleFailed/roleOk/operationCompleted/operationAborted"
+	 * 					result: "roleFailed/roleOk
 	 * 					response:tableJsonRepresentation
 	 * 				}
 	 */
-	public void freeTableRequest(String Request) {
-		JsonObject obj=JsonParser.parseString(Request).getAsJsonObject();
-		String tableID=obj.get("tableID").getAsString();
-		int tableRoomNumber=obj.get("tableRoomNumber").getAsInt();
+	public void freeTableRequest(String request) {
+		Gson gson=new Gson();
+		tableOperation obj=gson.fromJson(request, tableOperation.class);
 		if(this.usersController.checkRole(
-				obj.get("user").getAsString()
-				,UsersData.User.userRoles.Accoglienza.name() ))
+				obj.user
+				,UsersData.User.userRoles.Accoglienza.name()))
 		{
-			String response=this.controllerRestaurant.setTableFree(
-							tableID,
-							tableRoomNumber);
+			obj.response=this.controllerRestaurant.setTableFree(
+							obj.tableID,
+							obj.tableRoomNumber);
 			
-			if(response.equals(TableState.StatesList.free.name())) 
-				obj.addProperty("result", results.operationCompleted.name());
-			else 
-				obj.addProperty("result",results.operationAborted.name());
-			obj.addProperty("response", 
-					this.controllerRestaurant.getTableJSON(tableID, tableRoomNumber,Optional.empty())
-					);
-		
+			obj.result=results.roleOk.name();
 		}
 		else 
 		{
-			obj.addProperty("result", results.roleFailed.name());
-			obj.addProperty("response", "{}");
+			obj.result= results.roleFailed.name();
 		}
-		this.brokerIface.publishResponse(obj.getAsString());
+		this.brokerIface.publishResponse(gson.toJson(obj,tableOperation.class));
 	}
 	
 	/**
@@ -269,30 +224,30 @@ public class SystemController  extends GeneralController{
 	 * 				}
 	 */
 	public void orderToTableGenerationRequest(String request) {
-		JsonObject obj=JsonParser.parseString(request).getAsJsonObject();
-		String tableID=obj.get("tableID").getAsString();
-		int tableRoomNumber=obj.get("tableRoomNumber").getAsInt();
-		String userID=obj.get("user").getAsString();
-		OrderParameters param=getOrderParametersFromRequest(request);
+		Gson gson=new Gson();
+		messages.orderToTableGenerationRequest obj=gson.fromJson(request,
+				messages.orderToTableGenerationRequest.class);
 		if(this.usersController.checkRole(
-				userID
+				obj.user
 				,UsersData.User.userRoles.Accoglienza.name() ))
 		{
-			obj.addProperty("result", 
+			obj.result=results.roleOk.name();
+			obj.response=
 					this.controllerRestaurant.generateOrderForTable
-					(		param.itemNames, 
-							param.addGoods,
-							param.subGoods, 
-							param.priority,
-							tableID, tableRoomNumber, Integer.valueOf(userID))
-					);
-			//obj.addProperty("response", this.controllerRestaurant.getLastOrderJSON());
+					(		obj.orderParams.itemNames, 
+							obj.orderParams.addGoods,
+							obj.orderParams.subGoods, 
+							obj.orderParams.priority,
+							obj.tableID, obj.tableRoomNumber, Integer.valueOf(obj.user))
+					;
+			
 		}
 		else {
-			obj.addProperty("result",results.roleFailed.name());
-			//obj.addProperty("result", "{}");
+			obj.result=results.roleFailed.name();
+			
 		}
-		this.brokerIface.publishResponse(obj.getAsString());
+		this.brokerIface.publishResponse(gson.toJson(obj,messages.
+															orderToTableGenerationRequest.class));
 	}
 	
 	public void cancelOrder(String request) {
@@ -302,24 +257,5 @@ public class SystemController  extends GeneralController{
 	}
 	
 	
-	/**
-	 * 
-	 * @param request
-	 * @return the order parameters
-	 */
-	private static OrderParameters getOrderParametersFromRequest(String request){
-	/*	JsonObject obj=JsonParser.parseString(request).getAsJsonObject();
-		JsonArray orderLines=obj.get("orderLines").getAsJsonArray();
-		List<String> names=new ArrayList<>();
-		for(int i=0;i<orderLines.size();i++) {
-			names.add(
-					orderLines.get(i).getAsJsonObject().get("menuItem").getAsString()
-					);
-		}
-		return names;*/
-		OrderParameters toRet;
-		Gson gson=new Gson();
-		toRet=gson.fromJson(request, OrderParameters.class);
-		return toRet;
-	}
+
 }
