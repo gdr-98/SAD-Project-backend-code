@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.platform.commons.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 //import org.springframework.beans.factory.annotation.Autowired;
@@ -201,7 +200,7 @@ public class MenuAndGoodsController { //Aggiornato il nome con conseguente aggiu
      * @return list of menuItem in JSON(the entire menu if areaFlag false)
      */
     public String getMenuJSON(boolean areaFlag ,String area) {
-    	if(areaFlag &(StringUtils.isBlank(area)))
+    	if(areaFlag &(area.isBlank()))
     		return "";
     	JSONArray helper;
     	List<String> names;
