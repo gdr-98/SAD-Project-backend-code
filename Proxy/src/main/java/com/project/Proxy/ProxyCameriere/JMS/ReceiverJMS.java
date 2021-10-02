@@ -42,17 +42,16 @@ public class ReceiverJMS implements MessageListener {
         String msg_received = "";
         try {
             msg_received = (String) message.getBody(Object.class);
-
         } catch (JMSException ex) {
             ex.printStackTrace();
         }
 
-        Pattern p = Pattern.compile("\\.response\\.:\\.\\w+\\.");   // the pattern to search for
+        Pattern p = Pattern.compile("\"([^\"]*)\"");   // the pattern to search for
         Matcher m = p.matcher(msg_received);
 
         log.info("Event received: " + msg_received);
-        if (m.find()) {
-            message_type = m.group(0); //Controlla : Ritorna una stringa effettivamente ?
+        while (m.find()) {
+            message_type = m.group(1); //Controlla : Ritorna una stringa effettivamente ?
             switch (message_type) {
 
                 case "LoginResponse" :
@@ -61,24 +60,28 @@ public class ReceiverJMS implements MessageListener {
                     poster.createPost(("http://" + msg_object.URL + "/login"), "127.0.0.1:8080");
                     break;
 
+                /*
+                 * Advise every client of the event.
+                 * i.e. Create post request for every url registered in the webhook.
+                 */
                 case "DA DEFINIRE - Ordine completato parzialmente/completamente" :
                     for (String temp : webhook.getUrls()) {
                         poster.createPost(("http://" + temp + "/msg_receivedtion"), msg_received);
                     }
                     break;
 
-                case "Ordine Creato con successo" :
-                    
+                case "DA DEFINIRE - Ordine Creato con successo" :
+                    /*
+                     * Avvisa l'utente che ha creato l'ordine dell'avvenuta registrazione.
+                     * Per sapere a chi inviare, la business logic invia l'USERID. Il proxy
+                     * deve mappare ogni ID col relativo url e trovare l'utente cui mandare
+                     * la risposta.
+                     */
+                    break;
+
+                default:
                     break;
             }
-        }
-
-        /*
-         * Advise every client of the event.
-         * i.e. Create post request for every url registered in the webhook.
-         */
-        for (String temp : webhook.getUrls()) {
-            poster.createPost(("http://" + temp + "/msg_receivedtion"), msg_received);
         }
     }
 }
