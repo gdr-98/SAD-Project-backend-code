@@ -7,11 +7,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.platform.commons.util.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 //import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * */
-
+@Service
 public class MenuAndGoodsController { //Aggiornato il nome con conseguente aggiunta di lettere maiuscole !
 	
 	private List<MenuItem> menuItems=new ArrayList<MenuItem>();
@@ -19,8 +22,8 @@ public class MenuAndGoodsController { //Aggiornato il nome con conseguente aggiu
     private final MenuAndWarehouseDAO db;
     
     /**Inizializzazione da DB*/
-    
-    public MenuAndGoodsController(MenuAndWarehouseDAO db){
+    @Autowired
+    public MenuAndGoodsController(@Qualifier("psqlMenu") MenuAndWarehouseDAO db){
     	this.db=db;
     }
     

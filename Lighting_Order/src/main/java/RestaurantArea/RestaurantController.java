@@ -7,14 +7,16 @@ import com.google.gson.JsonParser;
 
 import DataAccess.RestaurantDAO;
 import java.util.Optional;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 
 import MenuAndWareHouseArea.MenuAndGoodsController;
 import MenuAndWareHouseArea.OrderedItem;
 import MenuAndWareHouseArea.OrderedItemState;
-import RestaurantArea.Order.OrderStates;
 
+@Service
 public class RestaurantController {
 	
 	public enum returnCodes{
@@ -22,6 +24,7 @@ public class RestaurantController {
 		tableNotFound,
 		orderNotCreated,
 		orderNotFound,
+		itemNotFound,
 		itemsNotAdded;
 	}
 	
@@ -29,8 +32,8 @@ public class RestaurantController {
 	private List<Order> orders=new ArrayList<>();
 	private RestaurantDAO db;
 	private MenuAndGoodsController menuAndWarehouseController;
-	
-	public RestaurantController(RestaurantDAO db,MenuAndGoodsController c) {
+	@Autowired
+	public RestaurantController(@Qualifier("psqlRestaurant")RestaurantDAO db,MenuAndGoodsController c) {
 		this.db=db;
 		this.menuAndWarehouseController=c;
 		 //retrieves all tables, the tables must ALWAYS be in the system
@@ -47,7 +50,7 @@ public class RestaurantController {
 		Table toAdd;
 		for(int i=0;i<array.size();i++) { //generate all the tables
 			toAdd=Table.getTableFromJSON(array.get(i).toString(),this);
-			toAdd.setController(this);
+			//toAdd.setController(this);
 			this.tables.add(
 					toAdd
 					);
@@ -424,25 +427,40 @@ public class RestaurantController {
 	 * @info modify an item 
 	 * @param orderID 
 	 * @param lineNumber
-	 * @return the json representation of the order else the specific error code
+	 * @return the specific status codes  string list, if the size is 1 then 
+	 * 			the order or the item wasn't found.
+	 * 			Else it is a 3 position array which contains  status codes  for  each single
+	 * 			operation performed.
+	 * 			Positions:
+	 * 			0-> addGoods
+	 * 			1->subGoods
+	 * 			2->priority
 	 */
 	
-	public String modifyItemInOrder(int orderID,int lineNumber) {
-		Order toMod=null;
-		boolean check=false;
+	public List<String> modifyItemInOrder(int orderID,int lineNumber,List<String>  additiveGoods,List<String> subGoods,
+			int priority) {
+		Order toMod=null;		
+		List<String> returnStatus=new ArrayList<>();
 		for(Order o:this.orders) {
 			if (o.isMe(orderID))
 				toMod=o;
 		}
 		if(toMod==null) {
-			return returnCodes.orderNotFound.name();
+			returnStatus.add(returnCodes.orderNotFound.name());
 		}
-	//	String=toMod.setAdditiveGoodsForItem(lineNumber);
-		
-		if(!check)
-			return	returnCodes.itemsNotAdded.name();
-		return toMod.getJSONRepresentation(Optional.empty());
-		
+		else {
+			Optional<OrderedItemState.StatusCodes> result1=toMod.setAdditiveGoodsForItem(additiveGoods, lineNumber);
+			Optional<OrderedItemState.StatusCodes>result2=toMod.setSubGoodsForItem(subGoods, lineNumber);
+			Optional<OrderedItemState.StatusCodes>result3=toMod.setPriorityForItem(priority, lineNumber);
+			if(result1.isEmpty())
+				 returnStatus.add(returnCodes.itemNotFound.name());
+			else {
+				returnStatus.add(result1.get().name());
+				returnStatus.add(result2.get().name());
+				returnStatus.add(result3.get().name());
+			}
+		}
+		return returnStatus;
 	}
 	
 	

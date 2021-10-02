@@ -75,6 +75,6 @@ public class OrderedItemStateWorking extends OrderedItemState {
 	 */
 	@Override
 	public  OrderedItemState.StatusCodes changePriority(int newPriority){
-		return StatusCodes.PriorityNotChangedCompleted;
+		return StatusCodes.PriorityNotChangedWorking;
 	}
 }

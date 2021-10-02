@@ -16,6 +16,12 @@ public class OrderedItemStateWaitingWorking extends OrderedItemState {
 	@Override
 	public OrderedItemState.StatusCodes setAdditive(List<String> new_additive) {
 		
+		if(new_additive.size()==0) {
+			//If no goods to add then return goods added
+			this.sc=OrderedItemState.StatusCodes.GoodsAdded;
+			return this.sc;
+		}
+		
 		MenuItem helper=orderedItem.getItem();	
 		List<Goods> to_add=helper.menuItemCustomer(true, new_additive);
 		//if nothing was found abort the operation
@@ -60,6 +66,11 @@ public class OrderedItemStateWaitingWorking extends OrderedItemState {
 	 */
 	@Override
 	public OrderedItemState.StatusCodes setSubGoods(List<String> new_sub) {
+		if(new_sub.size()==0) {
+			//if  no goods simply return a successful message
+			this.sc=OrderedItemState.StatusCodes.GoodsSubbed;
+			return this.sc;
+		}
 		MenuItem helper=orderedItem.getItem();
 		List<Goods> to_sub=helper.menuItemCustomer(false, new_sub);
 		//if nothing was found abort the operation

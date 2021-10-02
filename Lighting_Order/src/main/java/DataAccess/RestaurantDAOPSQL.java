@@ -9,11 +9,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.stereotype.Repository;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+@Repository("psqlRestaurant")
 public class RestaurantDAOPSQL implements RestaurantDAO {
 
 	private JdbcTemplate database;

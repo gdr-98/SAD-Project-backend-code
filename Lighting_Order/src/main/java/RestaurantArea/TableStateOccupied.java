@@ -62,7 +62,7 @@ public class TableStateOccupied extends TableState {
 			) {
 			this.statusCode=TableState.StatusCodes.OrderAddCompleted;
 			int id=this.associatedTable.getController().getDB().findNextOrderID();
-			Order newOrder=new Order(id,Optional.of(this.associatedTable),itemNames,additive,toSub,priority,userID);
+			Order newOrder=new Order(id,Optional.of(this.associatedTable),itemNames,additive,toSub,priority,userID,this.associatedTable.getController());
 			if(newOrder.numOfItems()>0) {
 				this.associatedTable.addOrderRaw(newOrder);
 				return Optional.of(

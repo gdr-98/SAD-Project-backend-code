@@ -43,7 +43,7 @@ class controllerTests {
 	
 	
 	
-	//@Test
+	@Test
 	void  getAllTablesTest1() {
 		String tables=controllerRestaurant.getAllTablesJSON(Optional.of(1),Optional.empty());
 		JsonArray arrayOfTables=JsonParser.parseString(tables).getAsJsonArray();
@@ -82,7 +82,7 @@ class controllerTests {
 
 	}
 	
-	//@Test
+	@Test
 	void getAllTables2() {
 		String tables=controllerRestaurant.getAllTablesJSON(Optional.of(2),Optional.empty());
 		JsonArray arrayOfTables=JsonParser.parseString(tables).getAsJsonArray();
@@ -214,7 +214,7 @@ class controllerTests {
 	}*/
 	
 	//Andiamo a liberare ed occupare i tavoli
-	//@Test
+	@Test
 	void putATableInWaitingForOrders() {
 		this.controllerRestaurant.setTableWaiting("1", 1);
 		JsonArray array= JsonParser.parseString(dbRestaurant.getAllTablesJSON()).getAsJsonArray();
@@ -265,7 +265,7 @@ class controllerTests {
 			assertTrue(false);
 	}
 	
-	//@Test
+	 @Test
 	void generateOrderTable() {
 		List<String> names=new ArrayList<>();
 		names.add("Margherita");
@@ -296,7 +296,7 @@ class controllerTests {
 	
 	}
 	
-	//@Test
+	@Test
 	void generateOrderTable2() {
 		List<String> names=new ArrayList<>();
 		names.add("Margherita");
@@ -328,7 +328,7 @@ class controllerTests {
 		
 	}
 	
-	//@Test
+	@Test
 	void generateOrderTable3() { //proviamo adesso a cambiare lo stato dell'ordereditem e di prennderlo inn lavoro
 		List<String> names=new ArrayList<>();
 		names.add("Margherita");
@@ -407,7 +407,7 @@ class controllerTests {
 	
 	
 	//Ultimo test, aggiungiamo due prodotti e poi vediamo che succede rimuovendone uno man mano
-	//@Test
+	@Test
 	void  generateOrderToTable4() {
 		
 		List<String> prodotti=new ArrayList<>();
@@ -572,10 +572,9 @@ class controllerTests {
 	
 	//Modify item test
 	@Test
-	void  modifyItemTes() {
+	void  modifyItemTest() {
 		List<String> prodotti=new ArrayList<>();
 		prodotti.add("Margherita");
-		//prodotti.add("Patate Fritte" ); Not yet..
 		List<String> additivi=new ArrayList<>();
 		List<String> sottr=new ArrayList<>();
 		List<String> additivi2=new ArrayList<>();
@@ -602,8 +601,62 @@ class controllerTests {
 		assertEquals(o.getJSONRepresentation(Optional.empty()),order);
 		assertEquals(o.getJSONRepresentation(Optional.empty()),dbRestaurant.getOrderById(dbRestaurant.findNextOrderID()-1));
 		
+		additivi.add("G001"); //Origano
+		additivi.add("G002"); //aglio
+		List<String> status=controllerRestaurant.modifyItemInOrder(o.getId(), o.getGreatestLineNumber(),
+				additivi, sottr, 1);
 		
 		
+		
+		//Item was found with the order
+		assertEquals(3,status.size());
+		assertEquals("GoodsAdded",status.get(0));
+		assertEquals("GoodsSubbed",status.get(1));
+		assertEquals("PriorityChanged",status.get(2));
+		int ln=o.getGreatestLineNumber();
+		assertEquals(additivi.size(),o.getAdditiveForItem(ln).get().size());
+		//check  if contains elements
+		boolean[] contains= {false,false};
+		int index=0;
+		for(String s :o.getAdditiveForItem(ln).get()) {
+			for(String k:additivi) {
+				if(k.equals(s)) {
+					contains[index]=true;
+					index++;
+				}
+			}
+		}
+		assertTrue(contains[0]);
+		assertTrue(contains[1]);
+		assertEquals(sottr,o.getSubForItem(ln).get());
+		assertEquals(1,o.getPriorityForItem(ln).get());
+		
+		
+		
+		//now  try to add  to an item in working
+		assertTrue(controllerRestaurant.itemInWorking(o.getId(), ln).get());
+		status=controllerRestaurant.modifyItemInOrder(o.getId(), o.getGreatestLineNumber(),
+				additivi, sottr, 1);
+		assertEquals("GoodsNotAddedInWorking",status.get(0));
+		assertEquals("GoodsNotSubbedInWorking",status.get(1));
+		assertEquals("PriorityNotChangedWorking",status.get(2));
+		assertEquals("Working",o.getOrderedItems().get(0).getState());
+		assertTrue(controllerRestaurant.itemComplete(o.getId(), ln).get());
+		status=controllerRestaurant.modifyItemInOrder(o.getId(), o.getGreatestLineNumber(),
+				additivi, sottr, 1);
+		assertEquals("GoodsNotAddedCompleted",status.get(0));
+		assertEquals("GoodsNotSubbedCompleted",status.get(1));
+		assertEquals("PriorityNotChangedCompleted",status.get(2));
+		
+		//Let's try when the order does not exist
+		assertEquals("orderNotFound",controllerRestaurant.modifyItemInOrder(200, o.getGreatestLineNumber(),
+				additivi, sottr, 1).get(0));
+		
+		//Let's try with a not existing item
+		assertEquals("itemNotFound",controllerRestaurant.modifyItemInOrder(o.getId(), 33,
+						additivi, sottr, 1).get(0));
+		controllerRestaurant.setTableFree("2", 1);
 		
 	}
+
 }

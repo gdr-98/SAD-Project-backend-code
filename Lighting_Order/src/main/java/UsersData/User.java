@@ -6,6 +6,8 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.stereotype.Service;
+
 import RestaurantArea.Order;
 
 /**JSON Format:
@@ -17,7 +19,7 @@ import RestaurantArea.Order;
  * }
  * */
 
-
+@Service
 public class User {
 	private List<Order> order;
 	private String name;

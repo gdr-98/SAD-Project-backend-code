@@ -9,7 +9,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
-
+import org.springframework.stereotype.Repository;
+@Repository("psqlUsers")
 public class UserDAOPSQL implements UsersDAO {
 	
 	

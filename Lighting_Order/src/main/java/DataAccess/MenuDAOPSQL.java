@@ -9,8 +9,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.stereotype.Repository;
 
-
+@Repository("psqlMenu")
 public class MenuDAOPSQL implements MenuAndWarehouseDAO {
 
 	private JdbcTemplate database;

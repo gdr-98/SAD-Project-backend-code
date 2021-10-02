@@ -52,6 +52,9 @@ public class Order {
 	 */
 	@Expose(serialize=false,deserialize=false)
 	private Optional<Table> associatedTable=Optional.empty();
+	
+	@Expose(serialize=false,deserialize=false)
+	private RestaurantController controller;
 
 	/**
 	 * 
@@ -63,25 +66,27 @@ public class Order {
 	 * @param priority of the items
 	 */
 	public Order(int id,Optional<Table>t,List<String>itemsNames,List<List<String>>additiveGoods,
-			List<List<String>>subGoods,List<Integer>priority,Integer userID) {
+			List<List<String>>subGoods,List<Integer>priority,Integer userID,
+			RestaurantController  controller) {
 		this.orderID=id;
 		this.associatedTable=t;
 		this.orderState=OrderStates.WaitingForWorking;
+		this.controller=controller;
 		this.orderedItems=generateItemRaw(itemsNames,additiveGoods,subGoods,priority);
 		
 		//Insert ordered items
 		for(OrderedItem item:this.orderedItems)
 			item.setLineNumber(this.getGreatestLineNumber()+1);
-				
+		
 		//Insert the order into the database
-		this.associatedTable.get().getController().getDB().insertOrderByJSON
+		this.controller.getDB().insertOrderByJSON
 			(this.getJSONRepresentation(Optional.empty()), userID);
 		
 		//register the order to the controller
-		associatedTable.get().getController().registerOrder(this);
+		this.controller.registerOrder(this);
 	}
 	
-	public Order(String jsonRepresentation,Optional<Table> t) {
+	public Order(String jsonRepresentation,Optional<Table> t,RestaurantController controller) {
 		JsonObject obj=JsonParser.parseString(jsonRepresentation).getAsJsonObject();
 		JsonArray arrayOfItems;
 		JsonObject singleItem;
@@ -89,6 +94,7 @@ public class Order {
 		this.associatedTable=t;
 		this.orderID=obj.get("orderID").getAsInt();
 		this.associatedTable=t;
+		this.controller=controller;
 		this.completedItemNumber=obj.get("completedItemNumber").getAsInt();
 		//System.out.println(obj.get("orderState").getAsString());
 		this.orderState=OrderStates.valueOf(obj.get("orderState").getAsString());
@@ -98,7 +104,7 @@ public class Order {
 		for(int i=0;i<arrayOfItems.size();i++) {
 			
 			singleItem=arrayOfItems.get(i).getAsJsonObject();
-			OrderedItem item=this.associatedTable.get().getController().
+			OrderedItem item=this.controller.
 					askForOrderedItem(singleItem.get("item").getAsString()).get();
 			helper1=singleItem.get("sub").getAsJsonArray();
 			for(int j=0;j<helper1.size();j++)
@@ -117,7 +123,7 @@ public class Order {
 		}
 		
 		//register the order to the controller
-		associatedTable.get().getController().registerOrder(this);
+		this.controller.registerOrder(this);
 	}
 	/**
 	 * 
@@ -149,7 +155,7 @@ public class Order {
 			to_add.setLineNumber(this.getGreatestLineNumber()+1); 
 			orderedItems.add(to_add);
 			//Add the item in the database
-			this.associatedTable.get().getController().getDB().addOrderedItem(to_add.getJSONRepresentation(), 
+			this.controller.getDB().addOrderedItem(to_add.getJSONRepresentation(), 
 					this.orderID);	
 	}
 	/**
@@ -174,7 +180,7 @@ public class Order {
 				Optional<OrderedItem> helper;
 				OrderedItem helper2;
 				for(int i=0;i<names.size();i++){
-					helper=this.associatedTable.get().getController().askForOrderedItem(names.get(i));
+					helper=this.controller.askForOrderedItem(names.get(i));
 					if(helper.isPresent()) {
 						helper2=helper.get();
 						helper2.changeAddGoods(additive.get(i));
@@ -271,7 +277,7 @@ public class Order {
 					if(this.orderedItems.size()==this.completedItemNumber) { //If it was the last item then the order is completed
 						this.orderState=OrderStates.Completed; 
 						//Update the db..
-						this.associatedTable.get().getController().getDB(). //remove the item from the database
+						this.controller.getDB(). //remove the item from the database
 						removeOrderedItem(this.orderID, lineNumber);
 					}
 					return true;
@@ -292,12 +298,12 @@ public class Order {
 				item.setWorking();
 				if(item.getState().equals("Working")) {
 					//Update the item
-					this.associatedTable.get().getController().getDB().updateOrderedItem(item.getJSONRepresentation(), this.orderID);
+					this.controller.getDB().updateOrderedItem(item.getJSONRepresentation(), this.orderID);
 					if(this.orderState.name().equals("WaitingForWorking")) 
 						//if it was the first then set completed
 					{
 						this.orderState=OrderStates.Working;
-						this.associatedTable.get().getController().getDB().
+						this.controller.getDB().
 						updateOrderByJSON(this.getJSONRepresentation(Optional.empty()));
 					}
 					return true;
@@ -325,9 +331,9 @@ public class Order {
 					//once an order enters in working it can only be completed
 					if(this.completedItemNumber==this.orderedItems.size())
 						this.orderState=OrderStates.Completed;
-					this.associatedTable.get().getController().getDB().
+					this.controller.getDB().
 						updateOrderByJSON(this.getJSONRepresentation(Optional.empty()));
-					this.associatedTable.get().getController().getDB().updateOrderedItem(item.getJSONRepresentation(), this.orderID);
+					this.controller.getDB().updateOrderedItem(item.getJSONRepresentation(), this.orderID);
 					return true;
 				}
 				else
@@ -381,9 +387,12 @@ public class Order {
 	 * @return	status code of the operation
 	 */
 	public Optional<OrderedItemState.StatusCodes> setAdditiveGoodsForItem(List<String> additiveGoods,int lineNumber) {
+		OrderedItemState.StatusCodes toRet;
 		for(OrderedItem item:orderedItems) {
 			if(item.isMe(lineNumber)) {
-				 return Optional.of(item.changeAddGoods(additiveGoods));
+				toRet=item.changeAddGoods(additiveGoods);
+				this.controller.getDB().updateOrderedItem(item.getJSONRepresentation(), this.orderID);
+				return Optional.of(toRet);
 			}	
 		}
 		return Optional.empty();
@@ -398,9 +407,12 @@ public class Order {
 	 * @return	status code of the operation
 	 */
 	public Optional<OrderedItemState.StatusCodes> setSubGoodsForItem(List<String> subGoods,int lineNumber) {
+		OrderedItemState.StatusCodes toRet;
 		for(OrderedItem item:orderedItems) {
 			if(item.isMe(lineNumber)) {
-				 return Optional.of(item.changeSubGoods(subGoods));
+				toRet=item.changeSubGoods(subGoods);
+				this.controller.getDB().updateOrderedItem(item.getJSONRepresentation(), this.orderID);
+				return Optional.of(toRet);
 			}	
 		}
 		return Optional.empty();
@@ -447,6 +459,7 @@ public class Order {
 		return !this.orderState.equals(OrderStates.Working);
 	}
 	
+
 	/**
 	 * 
 	 * @param lineNumber of the item
@@ -468,10 +481,30 @@ public class Order {
 	 * @return the status code of th eoperation
 	 */
 	public Optional<OrderedItemState.StatusCodes> setPriorityForItem(int newPriority,int lineNumber){
+		OrderedItemState.StatusCodes toRet;
 		for(OrderedItem items :this.orderedItems) {
-			if (items.isMe(lineNumber))
-				return Optional.of(items.changePriority(newPriority));
+			if (items.isMe(lineNumber)) {
+				toRet=items.changePriority(newPriority);
+				//The update of an ordered  item should be done from the item,
+				//we should modify the dao but i'm  actually lazy..
+				this.controller.getDB().updateOrderedItem(items.getJSONRepresentation(), this.orderID);
+				return Optional.of(toRet);
+			}
 		}
 		return Optional.empty();
+	}
+	
+	/**
+	 * 
+	 * @param lineNumber of the item
+	 * @return  empty if  the item doesn't  exist else his priority
+	 */
+	public Optional<Integer> getPriorityForItem(int lineNumber){
+		Optional<Integer> toRet=Optional.empty();
+		for(OrderedItem items:this.orderedItems) {
+			if(items.isMe(lineNumber))
+				return Optional.of(items.getPriority());
+		}
+		return toRet;
 	}
 }

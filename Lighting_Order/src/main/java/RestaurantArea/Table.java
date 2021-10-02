@@ -231,11 +231,12 @@ public class Table {
 		Table toRet=gson.fromJson(to_init, Table.class);
 		toRet.initOrders();
 		toRet.setController(c);
+		
 		//init the state
 		toRet.setStateFromString(to_init.get("tableState").getAsString());
 		JsonArray arrayOfOrders=to_init.get("orders").getAsJsonArray();
 		for(int i=0;i<arrayOfOrders.size();i++) {
-			toRet.addOrderRaw(new Order(arrayOfOrders.get(i).toString(),Optional.of(toRet)));
+			toRet.addOrderRaw(new Order(arrayOfOrders.get(i).toString(),Optional.of(toRet),c));
 		}
 		return toRet;
 	}
@@ -243,4 +244,9 @@ public class Table {
 	public void setController(RestaurantController c) { this.controller=c;}
 	
 	public RestaurantController getController() { return this.controller;}
+	
+	/**
+ 	 * @info when obtaining the object  from json we need to re-init the orderslist
+ 	 */
+ 	public void initOrders() { this.orders=new ArrayList<>();}
 }

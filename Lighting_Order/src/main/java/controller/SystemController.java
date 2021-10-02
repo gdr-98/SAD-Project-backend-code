@@ -7,6 +7,9 @@ import UsersData.UsersController;
 
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 
@@ -19,10 +22,16 @@ import java.util.HashMap;
 
 import java.util.List;
 import java.util.ArrayList;
+
+
+
 /**
  * @info: the controller that the system uses
  */
+
+@Service
 public class SystemController  extends GeneralController{
+	
 	private BrokerInterface brokerIface;
 	/**
 	 * 
@@ -31,6 +40,7 @@ public class SystemController  extends GeneralController{
 	public void setBrokerListener(BrokerInterface iface) {
 		this.brokerIface=iface;
 	}
+	@Autowired
 	public SystemController(MenuAndGoodsController controllerMenu,
 			RestaurantController controllerRestaurant,UsersController usersController) {
 		super(controllerMenu,controllerRestaurant,usersController);

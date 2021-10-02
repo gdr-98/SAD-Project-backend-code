@@ -45,7 +45,7 @@ public class TableStateWaitingForOrders extends TableState {
 			List<Integer> priority,Integer userID
 			) {
 		int id=this.associatedTable.getController().getDB().findNextOrderID();
-		Order newOrder=new Order(id,Optional.of(this.associatedTable),itemNames,additive,toSub,priority,userID);
+		Order newOrder=new Order(id,Optional.of(this.associatedTable),itemNames,additive,toSub,priority,userID,this.associatedTable.getController());
 		if(newOrder.numOfItems()>0) {
 			this.associatedTable.addOrderRaw(newOrder);
 			this.associatedTable.changeState(new TableStateOccupied(this.associatedTable));
