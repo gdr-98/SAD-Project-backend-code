@@ -15,6 +15,7 @@ import com.google.gson.JsonArray;
 
 import UsersData.User;
 import com.google.gson.JsonParser;
+import com.google.gson.annotations.Expose;
 import com.google.gson.JsonObject;
 
 import java.util.Map;
@@ -46,6 +47,24 @@ public class SystemController  extends GeneralController{
 		super(controllerMenu,controllerRestaurant,usersController);
 	}
 	
+	private enum results{
+		roleFailed,
+		roleOk,
+		operationCompleted,
+		operationAborted;
+	}
+	
+	private class OrderParameters{
+		@Expose(serialize=true,   deserialize=true)
+		public List<String> itemNames;
+		@Expose(serialize=true, deserialize=true)
+		public List<List<String>> addGoods;
+		@Expose(serialize=true,deserialize=true)
+		public List<List<String>>subGoods;
+		@Expose(serialize=true,deserialize=true)
+		public List<Integer>  priority;
+	}
+
 	/**
 	 * @info Satisfy a menuRequest and publish the response to the broker
 	 * 	request:	{
@@ -70,11 +89,11 @@ public class SystemController  extends GeneralController{
 					,UsersData.User.userRoles.Cameriere.name() ))
 			{
 				String response=this.controllerMenu.getMenuJSON(obj.get("areaVisualization").getAsBoolean(), obj.get("areaMenu").getAsString());
-				obj.addProperty("result", "roleOk");
+				obj.addProperty("result", results.roleOk.name());
 				obj.add("response", JsonParser.parseString(response).getAsJsonArray());
 			}
 			else {
-				obj.addProperty("result", "roleFailed");
+				obj.addProperty("result", results.roleFailed.name());
 				obj.addProperty("response", "[]");
 			}
 			this.brokerIface.publishResponse(obj.getAsString());
@@ -89,6 +108,8 @@ public class SystemController  extends GeneralController{
 	 * 					request:"showTables"
 	 * 					forRoom:"yes/no"
 	 * 					roomNumber:"roomNumber"
+	 * 					showItemsInArea:"yes/no"
+	 * 					orderArea:"areaOfTheOrders"
 	 * 					}
 	 * 		response:	{
 	 * 					request
@@ -109,17 +130,21 @@ public class SystemController  extends GeneralController{
 						,UsersData.User.userRoles.Cameriere.name() ))
 		{
 			String response;
-			if(!obj.get("forRoom").getAsBoolean()) 
-				response=this.controllerRestaurant.getAllTablesJSON(Optional.empty());
-			else
-				response=this.controllerRestaurant.getAllTablesJSON(Optional.of(
-							obj.get("roomNumber").getAsInt())
-						);
-			obj.addProperty("result", "roleOk");
+			Optional<String> area=Optional.empty();
+			Optional<Integer> room=Optional.empty();
+			
+			if(obj.get("forRoom").getAsBoolean())
+				room=Optional.of(obj.get("roomNumber").getAsInt());
+			if(obj.get("showItemsInArea").getAsBoolean())
+				area=Optional.of(obj.get("orderArea").getAsString());
+			
+			response=this.controllerRestaurant.getAllTablesJSON(room, area);
+			
+			obj.addProperty("result", results.roleOk.name());
 			obj.add("response", JsonParser.parseString(response).getAsJsonArray());
 		}
 		else {
-			obj.addProperty("result", "roleFailed");
+			obj.addProperty("result", results.roleFailed.name());
 			obj.addProperty("response", "[]");
 		}
 		this.brokerIface.publishResponse(obj.getAsString());
@@ -149,35 +174,37 @@ public class SystemController  extends GeneralController{
 		int tableRoomNumber=obj.get("tableRoomNumber").getAsInt();
 		if(this.usersController.checkRole(
 				obj.get("user").getAsString()
-				,UsersData.User.userRoles.Accoglienza.name() ))
+				,UsersData.User.userRoles.Accoglienza.name()))
 		{
-			String response=this.controllerRestaurant.tableInWaitingForOrders(
+			String response=this.controllerRestaurant.setTableWaiting(
 							tableID,
 							tableRoomNumber);
-			if(response.equals(TableState.StatesList.waitingForOrders.name())) 
-				obj.addProperty("result", "operationCompleted");
 			
+			if(response.equals(TableState.StatesList.waitingForOrders.name())) 
+				obj.addProperty("result",results.operationCompleted.name());
 			else 
-				obj.addProperty("result", "operationAborted");
+				obj.addProperty("result", results.operationAborted.name());
+			
 			obj.addProperty("response", 
-					this.controllerRestaurant.getTableJSON(tableID, tableRoomNumber)
+					this.controllerRestaurant.getTableJSON(tableID, tableRoomNumber,Optional.empty())
 					);
 		
 		}
 		else 
 		{
-			obj.addProperty("result", "roleFailed");
+			obj.addProperty("result", results.roleFailed.name());
 			obj.addProperty("response", "{}");
 		}
+		this.brokerIface.publishResponse(obj.getAsString());
 	}
 	
 	/**
-	 * @info a user sits in a table waiting to order
+	 * @info a table must be freed
 	 * @param Request, alter a table state and publish the response to the broker
 	 * request:		{
 	 * 					user:"userID"
 	 * 					proxySource:"NameOfTheProxySource"
-	 * 					request:"freeATable"
+	 * 					request:"freeTable"
 	 * 					tableID:"tableIDValue"
 	 * 					tableRoomNumber:"tableRoomNumber"
 	 * 					
@@ -188,7 +215,7 @@ public class SystemController  extends GeneralController{
 	 * 					response:tableJsonRepresentation
 	 * 				}
 	 */
-	public void freeATableRequest(String Request) {
+	public void freeTableRequest(String Request) {
 		JsonObject obj=JsonParser.parseString(Request).getAsJsonObject();
 		String tableID=obj.get("tableID").getAsString();
 		int tableRoomNumber=obj.get("tableRoomNumber").getAsInt();
@@ -196,28 +223,29 @@ public class SystemController  extends GeneralController{
 				obj.get("user").getAsString()
 				,UsersData.User.userRoles.Accoglienza.name() ))
 		{
-			String response=this.controllerRestaurant.freeTable(
+			String response=this.controllerRestaurant.setTableFree(
 							tableID,
 							tableRoomNumber);
-			if(response.equals(TableState.StatesList.free.name())) 
-				obj.addProperty("result", "operationCompleted");
 			
+			if(response.equals(TableState.StatesList.free.name())) 
+				obj.addProperty("result", results.operationCompleted.name());
 			else 
-				obj.addProperty("result", "operationAborted");
+				obj.addProperty("result",results.operationAborted.name());
 			obj.addProperty("response", 
-					this.controllerRestaurant.getTableJSON(tableID, tableRoomNumber)
+					this.controllerRestaurant.getTableJSON(tableID, tableRoomNumber,Optional.empty())
 					);
 		
 		}
 		else 
 		{
-			obj.addProperty("result", "roleFailed");
+			obj.addProperty("result", results.roleFailed.name());
 			obj.addProperty("response", "{}");
 		}
+		this.brokerIface.publishResponse(obj.getAsString());
 	}
 	
 	/**
-	 * @info a user sits in a table waiting to order
+	 * @info a waiter generates an order
 	 * @param Request, alter a table state and publish the response to the broker
 	 * request:		{
 	 * 					user:"userID"
@@ -225,90 +253,73 @@ public class SystemController  extends GeneralController{
 	 * 					request:"orderToTableGeneration"
 	 * 					tableID:"tableIDValue"
 	 * 					tableRoomNumber:"tableRoomNumber"
-	 * 					orderLines: [{
-	 * 									menuItem:"menuItemName"
-	 * 									priority:"priority"
-	 * 									additiveGoodsIds:[good1...]
-	 * 									subGoodsIds:[good1...]
-	 * 
-	 * 									....]
-	 * 					
+	 * 					orderParams{
+	 * 							itemNames:	[itemname1...]
+	 * 							addGoods:	[ 	[addGoods1ForItem1 ...addGoodsNforItem1]
+	 * 											..]
+	 * 							subGoods:	[ 	[subGoods1ForItem1 ...subGoodsNforItem1]
+	 * 											..]
+	 * 							priority:	[priorityForItem1....]
+	 * 					}
 	 * 				}
 	 * 	response:	{
 	 * 					request
-	 * 					result: "roleFailed/roleOk/operationReport"
-	 * 					response:orderJsonRepresentation
+	 * 					result: "roleFailed/roleOk/operationReturnCode"
+	 * 					response: empty
 	 * 				}
 	 */
-	public void orderToTableGenerationRequest(String Request) {
-		JsonObject obj=JsonParser.parseString(Request).getAsJsonObject();
+	public void orderToTableGenerationRequest(String request) {
+		JsonObject obj=JsonParser.parseString(request).getAsJsonObject();
 		String tableID=obj.get("tableID").getAsString();
 		int tableRoomNumber=obj.get("tableRoomNumber").getAsInt();
 		String userID=obj.get("user").getAsString();
+		OrderParameters param=getOrderParametersFromRequest(request);
 		if(this.usersController.checkRole(
 				userID
 				,UsersData.User.userRoles.Accoglienza.name() ))
 		{
 			obj.addProperty("result", 
-					this.controllerRestaurant.generateOrderAndAddToTable(
-							getGoodsFromOrderRequest(Request,"additiveGoodsIds"), 
-							getGoodsFromOrderRequest(Request,"subGoodsIds"),
-							getPriorityFromOrderRequest(Request), 
-							tableID,
-							tableRoomNumber,
-							userID)
+					this.controllerRestaurant.generateOrderForTable
+					(		param.itemNames, 
+							param.addGoods,
+							param.subGoods, 
+							param.priority,
+							tableID, tableRoomNumber, Integer.valueOf(userID))
 					);
-			obj.addProperty("response", this.controllerRestaurant.getLastOrderJSON());
+			//obj.addProperty("response", this.controllerRestaurant.getLastOrderJSON());
 		}
 		else {
-			obj.addProperty("result", "roleFailed");
-			obj.addProperty("result", "{}");
-		}		
+			obj.addProperty("result",results.roleFailed.name());
+			//obj.addProperty("result", "{}");
+		}
+		this.brokerIface.publishResponse(obj.getAsString());
 	}
 	
-	//public void canceRequest
+	public void cancelOrder(String request) {
+		
+		
+		this.brokerIface.publishResponse(obj.getAsString());
+	}
 	
 	
 	/**
-	 * @info utility function
-	 * @param Request
-	 * @return the map of ordered item names and corresponent priority
+	 * 
+	 * @param request
+	 * @return the order parameters
 	 */
-	private static Map<String,Integer> getPriorityFromOrderRequest(String Request){
-		JsonObject obj=JsonParser.parseString(Request).getAsJsonObject();
-		JsonArray orderLines=obj.get("ordersLines").getAsJsonArray();
-		Map<String,Integer>toRet=new HashMap<>();
-		JsonObject helper;
-		for (int i=0;i<orderLines.size() ;i++) {
-			helper=orderLines.get(i).getAsJsonObject();
-			toRet.put(helper.get("menuItem").getAsString(),
-					helper.get("priority").getAsInt());
+	private static OrderParameters getOrderParametersFromRequest(String request){
+	/*	JsonObject obj=JsonParser.parseString(request).getAsJsonObject();
+		JsonArray orderLines=obj.get("orderLines").getAsJsonArray();
+		List<String> names=new ArrayList<>();
+		for(int i=0;i<orderLines.size();i++) {
+			names.add(
+					orderLines.get(i).getAsJsonObject().get("menuItem").getAsString()
+					);
 		}
+		return names;*/
+		OrderParameters toRet;
+		Gson gson=new Gson();
+		toRet=gson.fromJson(request, OrderParameters.class);
 		return toRet;
 	}
-	
-	/**
-	 * @info utility function
-	 * @param Request
-	 * @return the map of ordered item names and correspondent additive/subGoods
-	 */
-	private static Map<String,List<String>> getGoodsFromOrderRequest(String Request,
-				String field){
-		JsonObject obj=JsonParser.parseString(Request).getAsJsonObject();
-		JsonArray orderLines=obj.get("ordersLines").getAsJsonArray();
-		Map<String,List<String>>toRet=new HashMap<>();
-		List<String>goods=new ArrayList<>();
-		JsonObject helper;
-		JsonArray helper1;
-		for (int i=0;i<orderLines.size() ;i++) {
-			helper=orderLines.get(i).getAsJsonObject();
-			helper1=helper.get("subGoodsIds").getAsJsonArray();
-			for(int j=0;j<helper1.size();j++)
-				goods.add(helper1.get(j).getAsString());
-			toRet.put(helper.get("menuItem").getAsString(),
-					goods);
-		}
-		return toRet;
-	}
-	
 }
