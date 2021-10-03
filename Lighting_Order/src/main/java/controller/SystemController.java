@@ -4,21 +4,21 @@ import MenuAndWareHouseArea.MenuAndGoodsController;
 import RestaurantArea.RestaurantController;
 import RestaurantArea.RestaurantController.returnCodes;
 import UsersData.UsersController;
-import ch.qos.logback.core.joran.action.IADataForComplexProperty;
-import messages.cancelOrder;
+import messages.cancelOrderRequest;
 import messages.itemOpRequest;
 import messages.menuRequest;
+import messages.orderRequest;
 import messages.tableOperation;
 import messages.tableRequest;
 
-import java.util.ArrayList;
+
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
+
 
 /**
  * @info: the controller that the system uses
@@ -275,9 +275,9 @@ public class SystemController  extends GeneralController{
 	 * 					response:true/false
 	 *				}
 	 */
-	public void cancelOrder(String request) {
+	public void cancelOrderRequest(String request) {
 		Gson gson=new Gson();
-		cancelOrder obj=gson.fromJson(request, cancelOrder.class);
+		cancelOrderRequest obj=gson.fromJson(request, cancelOrderRequest.class);
 		
 		if(this.usersController.checkRole(
 				obj.user
@@ -292,7 +292,7 @@ public class SystemController  extends GeneralController{
 			obj.result=results.roleFailed.name();
 		
 		this.brokerIface.publishResponse(gson.toJson(obj,messages.
-															cancelOrder.class));
+															cancelOrderRequest.class));
 	}
 	
 	/**
@@ -301,7 +301,7 @@ public class SystemController  extends GeneralController{
 	 *  request:	{
 	 * 					user:"userID"
 	 * 					proxySource:"NameOfTheProxySource"
-	 * 					request:"cancelOrder"
+	 * 					request:"cancelOrderedItem"
 	 * 					orderID: "idOfTheOrder"
 	 * 					itemLineNumber:"itemLineNumber"
 	 * 				}
@@ -310,7 +310,7 @@ public class SystemController  extends GeneralController{
 	 * 					response:true/false
 	 *				}
 	 */
-	public void cancelOrderedItem(String request) {
+	public void cancelOrderedItemRequest(String request) {
 		Gson gson=new Gson();
 		itemOpRequest obj=gson.fromJson(request, itemOpRequest.class);
 		
@@ -354,7 +354,7 @@ public class SystemController  extends GeneralController{
 		
 	}
 	
-	public void itemComplete(String request) {
+	public void itemCompleteRequest(String request) {
 		
 		Gson gson=new Gson();
 		itemOpRequest obj=gson.fromJson(request, itemOpRequest.class);
@@ -375,5 +375,36 @@ public class SystemController  extends GeneralController{
 		this.brokerIface.publishResponse(gson.toJson(obj,messages.
 															itemOpRequest.class));
 		
+	}
+	
+	public void orderRequest(String request) {
+		Gson gson=new Gson();
+		orderRequest obj=gson.fromJson(request, orderRequest.class);
+		//checking the role of the request
+	
+		if(this.usersController.checkRole(
+				obj.user
+				,UsersData.User.userRoles.Bar.name() )
+				||this.usersController.checkRole(
+						obj.user
+						,UsersData.User.userRoles.Cucina.name() )
+				|| this.usersController.checkRole(
+						obj.user
+						,UsersData.User.userRoles.Forno.name() )
+				)
+		{
+			if(obj.areaVisualization)
+				obj.response=this.controllerRestaurant.getOrdersJSON(
+						Optional.of(obj.area));
+			else
+				obj.response=this.controllerRestaurant.getOrdersJSON(
+						Optional.empty());
+			obj.result= results.roleOk.name();
+		}
+		else {
+			obj.result=results.roleFailed.name();
+		}
+		this.brokerIface.publishResponse(gson.toJson(obj,orderRequest.class));
+	
 	}
 }
