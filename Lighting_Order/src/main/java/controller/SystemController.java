@@ -145,7 +145,6 @@ public class SystemController  extends GeneralController{
 	 * 					request:"userWaitingForOrderRequest"
 	 * 					tableID:"tableIDValue"
 	 * 					tableRoomNumber:"tableRoomNumber"
-	 * 					
 	 * 				}
 	 * 	response:	{
 	 * 					request
@@ -374,7 +373,6 @@ public class SystemController  extends GeneralController{
 		
 		this.brokerIface.publishResponse(gson.toJson(obj,messages.
 															itemOpRequest.class));
-		
 	}
 	
 	public void orderRequest(String request) {

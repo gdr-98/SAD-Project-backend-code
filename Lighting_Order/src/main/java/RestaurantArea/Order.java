@@ -43,7 +43,7 @@ public class Order {
 	
 	@Expose(serialize=false,deserialize=false)
 	List<OrderedItem> orderedItems=new ArrayList<>();
-	
+
 	@Expose
 	private int completedItemNumber=0;
 	
@@ -52,9 +52,13 @@ public class Order {
 	 */
 	@Expose(serialize=false,deserialize=false)
 	private Optional<Table> associatedTable=Optional.empty();
-	
+
 	@Expose(serialize=false,deserialize=false)
 	private RestaurantController controller;
+	
+	List<Integer>priority;
+	
+	List<List<Integer>> orderedItemByPriority;
 
 	/**
 	 * 
@@ -519,5 +523,9 @@ public class Order {
 				return true;
 		}
 		return false;
+	}
+	
+	private List<Integer> findMaxPriority(List<Integer> priorities ){
+		
 	}
 }

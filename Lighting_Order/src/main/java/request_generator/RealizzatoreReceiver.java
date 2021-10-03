@@ -15,7 +15,7 @@ public class RealizzatoreReceiver implements MessageListener {
 	
     @Autowired
     private DispatcherInfo dispatcherInfo;
-
+    
     String received;
     
     @JmsListener(destination = "CodaRealizzatore")
@@ -29,5 +29,4 @@ public class RealizzatoreReceiver implements MessageListener {
             ex.printStackTrace();
         }
     }
-    
 }
