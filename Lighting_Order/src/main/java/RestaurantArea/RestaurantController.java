@@ -25,7 +25,10 @@ public class RestaurantController {
 		orderNotCreated,
 		orderNotFound,
 		itemNotFound,
-		itemsNotAdded;
+		itemNotCanceled,
+		itemsNotAdded,
+		orderFound,
+		itemFound;
 	}
 	
 	private List<Table> tables=new ArrayList<>();
@@ -101,6 +104,7 @@ public class RestaurantController {
 	}
 	
 	/**
+	 * 
 	 * @roomNumber the value of the room
 	 * @return	the list of all tables in the system
 	 */
@@ -418,7 +422,7 @@ public class RestaurantController {
 		}
 		check=toMod.cancelOrderedItem(lineNumber);
 		if(!check)
-			return	returnCodes.itemsNotAdded.name();
+			return	returnCodes.itemNotCanceled.name();
 		return toMod.getJSONRepresentation(Optional.empty());
 		
 	}
@@ -463,6 +467,35 @@ public class RestaurantController {
 		return returnStatus;
 	}
 	
+	/**
+	 * 
+	 * @param orderID
+	 * @param itemLineNumber
+	 * @return orderNotFound if the order not exists,itemNotFound if the item Not exists
+	 * 			itemFound if the item exists
+	 */
+	public String hasItem(int orderID,int itemLineNumber) {
+		String toRet=returnCodes.orderNotFound.name();
+		boolean check=false;
+		int index=0;
+		while(!check && index<this.orders.size()) {
+			if(this.orders.get(index).isMe(orderID)) {
+				check=true;
+				toRet=returnCodes.itemNotFound.name();
+				if(this.orders.get(index).hasItem(itemLineNumber))
+					return returnCodes.itemFound.name();
+			}
+		}
+		return toRet;
+	}
+	
+	public String harOrder(int orderID) {
+		for(Order o:this.orders) {
+			if(o.isMe(orderID))
+				return returnCodes.orderFound.name();
+		}
+		return returnCodes.orderNotFound.name();
+	}
 	
 	/******************************************************************
 	 * 	Every good project has a lot of dead code of previous versions that maybe in a 

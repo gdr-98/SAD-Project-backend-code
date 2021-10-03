@@ -1,7 +1,4 @@
 package messages;
-
-
-
 public class baseMessage {
 	public String user;
 	public String proxySource;

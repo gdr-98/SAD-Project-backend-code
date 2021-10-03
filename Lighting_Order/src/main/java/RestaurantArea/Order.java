@@ -507,4 +507,17 @@ public class Order {
 		}
 		return toRet;
 	}
+	
+	/**
+	 * 
+	 * @param lineNumber
+	 * @return true if the item exists
+	 */
+	public boolean hasItem(int lineNumber) {
+		for(OrderedItem items:this.orderedItems) {
+			if(items.isMe(lineNumber))
+				return true;
+		}
+		return false;
+	}
 }

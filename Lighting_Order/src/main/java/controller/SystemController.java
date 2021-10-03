@@ -2,17 +2,23 @@ package controller;
 
 import MenuAndWareHouseArea.MenuAndGoodsController;
 import RestaurantArea.RestaurantController;
+import RestaurantArea.RestaurantController.returnCodes;
 import UsersData.UsersController;
+import ch.qos.logback.core.joran.action.IADataForComplexProperty;
+import messages.cancelOrder;
+import messages.itemOpRequest;
 import messages.menuRequest;
 import messages.tableOperation;
 import messages.tableRequest;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 
 /**
  * @info: the controller that the system uses
@@ -40,6 +46,11 @@ public class SystemController  extends GeneralController{
 		roleOk,
 		operationCompleted,
 		operationAborted;
+	}
+	public enum responses{
+		orderCanceled,
+		orderNotCanceled,
+		orderNotFound;
 	}
 	
 	/**
@@ -229,7 +240,7 @@ public class SystemController  extends GeneralController{
 				messages.orderToTableGenerationRequest.class);
 		if(this.usersController.checkRole(
 				obj.user
-				,UsersData.User.userRoles.Accoglienza.name() ))
+				,UsersData.User.userRoles.Cameriere.name() ))
 		{
 			obj.result=results.roleOk.name();
 			obj.response=
@@ -250,12 +261,119 @@ public class SystemController  extends GeneralController{
 															orderToTableGenerationRequest.class));
 	}
 	
+	/**
+	 * 
+	 * @param request
+	 *  request:	{
+	 * 					user:"userID"
+	 * 					proxySource:"NameOfTheProxySource"
+	 * 					request:"cancelOrder"
+	 * 					orderID: "idOfTheOrder"
+	 * 				}
+	 * response		{
+	 * 					result:	roleOk/roleFailed/orderFound/orderNotFounnd
+	 * 					response:true/false
+	 *				}
+	 */
 	public void cancelOrder(String request) {
+		Gson gson=new Gson();
+		cancelOrder obj=gson.fromJson(request, cancelOrder.class);
 		
+		if(this.usersController.checkRole(
+				obj.user
+				,UsersData.User.userRoles.Cameriere.name() ))
+		{
+			obj.result=this.controllerRestaurant.harOrder(obj.orderID);
+			if(obj.result.equals(returnCodes.orderFound.name()))
+					obj.response=controllerRestaurant.cancelOrder(obj.orderID)
+																		.get().toString();
+		}
+		else 
+			obj.result=results.roleFailed.name();
 		
-		//this.brokerIface.publishResponse(obj.getAsString());
+		this.brokerIface.publishResponse(gson.toJson(obj,messages.
+															cancelOrder.class));
 	}
 	
+	/**
+	 * 
+	 * @param request
+	 *  request:	{
+	 * 					user:"userID"
+	 * 					proxySource:"NameOfTheProxySource"
+	 * 					request:"cancelOrder"
+	 * 					orderID: "idOfTheOrder"
+	 * 					itemLineNumber:"itemLineNumber"
+	 * 				}
+	 * response		{
+	 * 					result:	roleOk/roleFailed/orderNotFound/itemFound/itemNotFound
+	 * 					response:true/false
+	 *				}
+	 */
+	public void cancelOrderedItem(String request) {
+		Gson gson=new Gson();
+		itemOpRequest obj=gson.fromJson(request, itemOpRequest.class);
+		
+		if(this.usersController.checkRole(
+				obj.user
+				,UsersData.User.userRoles.Cameriere.name() ))
+		{
+			obj.result=this.controllerRestaurant.hasItem(obj.orderID,obj.itemLineNumber);
+			if(obj.result.equals(returnCodes.itemFound.name()))
+					obj.response=controllerRestaurant.deleteItemFromOrder(obj.orderID,
+														obj.itemLineNumber);
+																	
+		}
+		else 
+			obj.result=results.roleFailed.name();
+		
+		this.brokerIface.publishResponse(gson.toJson(obj,messages.
+															itemOpRequest.class));
+	}
 	
-
+	public void itemWorkingRequest(String request) {
+		
+		Gson gson=new Gson();
+		itemOpRequest obj=gson.fromJson(request, itemOpRequest.class);
+		
+		if(this.usersController.checkRole(
+				obj.user
+				,UsersData.User.userRoles.Cameriere.name() ))
+		{
+			obj.result=this.controllerRestaurant.hasItem(obj.orderID,obj.itemLineNumber);
+			if(obj.result.equals(returnCodes.itemFound.name()))
+					obj.response=controllerRestaurant.itemInWorking(obj.orderID,
+														obj.itemLineNumber).get().toString();
+																	
+		}
+		else 
+			obj.result=results.roleFailed.name();
+		
+		this.brokerIface.publishResponse(gson.toJson(obj,messages.
+															itemOpRequest.class));
+		
+	}
+	
+	public void itemComplete(String request) {
+		
+		Gson gson=new Gson();
+		itemOpRequest obj=gson.fromJson(request, itemOpRequest.class);
+		
+		if(this.usersController.checkRole(
+				obj.user
+				,UsersData.User.userRoles.Cameriere.name() ))
+		{
+			obj.result=this.controllerRestaurant.hasItem(obj.orderID,obj.itemLineNumber);
+			if(obj.result.equals(returnCodes.itemFound.name()))
+					obj.response=controllerRestaurant.itemComplete(obj.orderID,
+														obj.itemLineNumber).get().toString();
+																	
+		}
+		else 
+			obj.result=results.roleFailed.name();
+		
+		this.brokerIface.publishResponse(gson.toJson(obj,messages.
+															itemOpRequest.class));
+		
+	}
 }

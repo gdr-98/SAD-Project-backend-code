@@ -90,7 +90,7 @@ public class Table {
 		 String  helper1;
 		 for(Order order:this.orders) {
 			helper1=order.getJSONRepresentation(orderArea);
-			if(!helper1.isBlank()) //add the order only if it is not nnull
+			if(!helper1.isBlank()) //add the order only if it is not null
 				helper.add(JsonParser.parseString(helper1).getAsJsonObject());
 		 }
 		 
