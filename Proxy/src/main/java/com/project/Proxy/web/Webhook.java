@@ -1,35 +1,33 @@
 package com.project.Proxy.web;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 
-public class Webhook{
-    public static HashMap<String,String> Waiters = new HashMap<String,String>();
-    public static HashMap<String,String> Chef = new HashMap<String,String>();
-    public static HashMap<String,String> Pizza_maker = new HashMap<String,String>();
-    public static HashMap<String,String> Acceptance = new HashMap<String,String>();
-    public static HashMap<String,String> Barman = new HashMap<String,String>();
+public class Webhook {
+    private List<String> urls = new ArrayList<String>();
 
-    public Webhook(){}
-
-    // Add an entry to one of the hashmap
-    public static void Add_Waiter(String ID, String URL){
-        Waiters.put(ID,URL);
+    public Webhook () {
     }
 
-    public static  void Add_Chef(String ID, String URL){
-        Chef.put(ID,URL);
+    public Webhook (List<String> urls) {
+        this.urls = urls;
     }
 
-    public static void Add_Pizza_maker(String ID, String URL){
-        Pizza_maker.put(ID,URL);
+    public void addUrl (String url) {
+        this.urls.add(url);
     }
 
-    public static void Add_Barman(String ID, String URL){
-        Barman.put(ID,URL);
+    public int removeUrl (String url) {
+        if (this.urls.contains(url)) {
+            this.urls.remove(url);
+            return 0;
+        }
+        else {
+            return -1;
+        }
     }
 
-    public static void Add_Acceptance(String ID, String URL){
-        Acceptance.put(ID,URL);
+    public final List<String> getUrls () {
+        return urls;
     }
-
 }

@@ -1,8 +1,9 @@
 package com.project.Proxy.ProxyCameriere.JMS;
 
-import com.project.Proxy.web.BaseMessage;
+import com.google.gson.Gson;
 import com.project.Proxy.web.Post;
 import com.project.Proxy.web.Webhook;
+import org.apache.tomcat.util.json.JSONParser;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,8 +12,9 @@ import org.springframework.stereotype.Service;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
-import java.util.Map;
-
+import javax.json.JsonObject;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /*
  * Listen queue "CodaCamerieriBroker" and if detect an event
@@ -22,7 +24,11 @@ import java.util.Map;
 @Service
 public class ReceiverJMS implements MessageListener {
 
+    public Webhook webhook = new Webhook();
+
     private final Post poster = new Post();
+
+    Gson g = new Gson();
 
     private final Logger log = LoggerFactory.getLogger(ReceiverJMS.class);
 
@@ -32,51 +38,50 @@ public class ReceiverJMS implements MessageListener {
         /*
          * Retrieve body of the message sent by ActiveMQ.
          */
-
-        String url;
-        BaseMessage msg_received = new BaseMessage() ;
-        String msg_to_send = "";
+        String message_type = "";
+        String msg_received = "";
         try {
-            msg_received = (BaseMessage) message.getBody(Object.class);
-            msg_to_send = (String) message.getBody(Object.class);
+            msg_received = (String) message.getBody(Object.class);
         } catch (JMSException ex) {
             ex.printStackTrace();
         }
-        /*Message Types
-        tableRequest,
-                userWaitingForOrderRequest,  [n]
-                itemCompleteRequest,    [n]
-                menuRequest,    [1]
-                orderToTableGenerationRequest,  [1]
-                cancelOrderRequest,     [1]
-                cancelOrderedItemRequest,   [1]*/
 
-        switch (msg_received.request){
+        Pattern p = Pattern.compile("\"([^\"]*)\"");   // the pattern to search for
+        Matcher m = p.matcher(msg_received);
 
-            case "itemCompleteRequest" :
+        log.info("Event received: " + msg_received);
+        while (m.find()) {
+            message_type = m.group(1); //Controlla : Ritorna una stringa effettivamente ?
+            switch (message_type) {
 
-            case "userWaitingForOrderRequest" :
-                for (Map.Entry<String, String> me : Webhook.Waiters.entrySet()) {
-                     poster.createPost("http://"+ me.getValue()+"/notification",msg_to_send);
-                }
-                break;
+                case "LoginResponse" :
+                    LoginResponse msg_object = g.fromJson(msg_received, LoginResponse.class);
+                    webhook.addUrl(msg_object.URL);
+                    poster.createPost(("http://" + msg_object.URL + "/login"), "127.0.0.1:8080");
+                    break;
 
-            case "menuRequest" :
+                /*
+                 * Advise every client of the event.
+                 * i.e. Create post request for every url registered in the webhook.
+                 */
+                case "DA DEFINIRE - Ordine completato parzialmente/completamente" :
+                    for (String temp : webhook.getUrls()) {
+                        poster.createPost(("http://" + temp + "/msg_receivedtion"), msg_received);
+                    }
+                    break;
 
-            case "cancelOrderedItemRequest" :
+                case "DA DEFINIRE - Ordine Creato con successo" :
+                    /*
+                     * Avvisa l'utente che ha creato l'ordine dell'avvenuta registrazione.
+                     * Per sapere a chi inviare, la business logic invia l'USERID. Il proxy
+                     * deve mappare ogni ID col relativo url e trovare l'utente cui mandare
+                     * la risposta.
+                     */
+                    break;
 
-            case "orderToTableGenerationRequest" :
-
-            case "cancelOrderRequest" :
-                url = Webhook.Waiters.get(msg_received.user);
-                poster.createPost("http://"+ url +"/notification",msg_to_send);
-                break;
-
-            default :
-                log.info("Message do not match with any of the expected ones");
-
+                default:
+                    break;
+            }
         }
-
-        log.info("Event received: ");
     }
 }
