@@ -58,7 +58,7 @@ public class SystemController  extends GeneralController{
 	 * 	request:	{
 	 * 					user:"userID"
 	 * 					proxySource:"NameOfTheProxySource"
-	 * 					request:"showMenu"
+	 * 					request:"menuRequest"
 	 * 					areaVisualization:	"false/true"
 	 * 					areaMenu:"RequestedArea"(nameOfArea1/...)
 	 * 				}
@@ -94,7 +94,7 @@ public class SystemController  extends GeneralController{
 	 * 		request:	{
 	 * 					user:"userID"
 	 * 					proxySource:"NameOfTheProxySource"
-	 * 					request:"showTables"
+	 * 					request:"tableRequest"
 	 * 					forRoom:"yes/no"
 	 * 					roomNumber:"roomNumber"
 	 * 					showItemsInArea:"yes/no"
@@ -178,7 +178,7 @@ public class SystemController  extends GeneralController{
 	 * request:		{
 	 * 					user:"userID"
 	 * 					proxySource:"NameOfTheProxySource"
-	 * 					request:"freeTable"
+	 * 					request:"freeTableRequest"
 	 * 					tableID:"tableIDValue"
 	 * 					tableRoomNumber:"tableRoomNumber"
 	 * 					
@@ -215,7 +215,7 @@ public class SystemController  extends GeneralController{
 	 * request:		{
 	 * 					user:"userID"
 	 * 					proxySource:"NameOfTheProxySource"
-	 * 					request:"orderToTableGeneration"
+	 * 					request:"orderToTableGenerationRequest"
 	 * 					tableID:"tableIDValue"
 	 * 					tableRoomNumber:"tableRoomNumber"
 	 * 					orderParams{
@@ -266,7 +266,7 @@ public class SystemController  extends GeneralController{
 	 *  request:	{
 	 * 					user:"userID"
 	 * 					proxySource:"NameOfTheProxySource"
-	 * 					request:"cancelOrder"
+	 * 					request:"cancelOrderRequest"
 	 * 					orderID: "idOfTheOrder"
 	 * 				}
 	 * response		{
@@ -300,7 +300,7 @@ public class SystemController  extends GeneralController{
 	 *  request:	{
 	 * 					user:"userID"
 	 * 					proxySource:"NameOfTheProxySource"
-	 * 					request:"cancelOrderedItem"
+	 * 					request:"cancelOrderedItemRequest"
 	 * 					orderID: "idOfTheOrder"
 	 * 					itemLineNumber:"itemLineNumber"
 	 * 				}

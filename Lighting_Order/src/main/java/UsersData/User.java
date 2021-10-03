@@ -95,13 +95,10 @@ public class User {
 		for(String role : roles) 
 			this.roles.add(role);
 	}
-	
 	public boolean isMe(String id) {
 		if(id.equals(this.id))
 			return true;
 		else
 			return false;
 	}
-	
-
 }

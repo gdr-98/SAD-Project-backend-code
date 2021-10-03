@@ -56,14 +56,11 @@ public class Order {
 	@Expose(serialize=false,deserialize=false)
 	private RestaurantController controller;
 	
-	List<Integer>priority;
 	
-	List<List<Integer>> orderedItemByPriority;
-
 	/**
 	 * 
 	 * @param id of the order
-	 * @param t table
+	 * @param it table
 	 * @param itemsNames names of the items
 	 * @param additiveGoods additive goods of the items
 	 * @param subGoods sub goods of the items
@@ -525,7 +522,26 @@ public class Order {
 		return false;
 	}
 	
-	private List<Integer> findMaxPriority(List<Integer> priorities ){
+	/**
+	 * 
+	 * @return the ordered items with greater priority & not completed
+	 */
+	/*
+	private List<OrderedItem> remainingItems(){
+		List<OrderedItem> toRet=new ArrayList<>();
+		//Let's find max
+		int min=Integer.MAX_VALUE;
+		int itemPriority;
+		for(OrderedItem item :this.orderedItems) {
+			itemPriority=item.getPriority();
+			if(itemPriority<min && !item.getState().equals("Completed"))
+				min=item.getPriority();
+		}
 		
-	}
+		for(OrderedItem item :this.orderedItems) {
+			if(item.getPriority()==min && !item.getState().equals("Completed"))
+				toRet.add(item);
+		}
+		return toRet;
+	}*/
 }
