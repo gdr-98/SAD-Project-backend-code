@@ -11,23 +11,31 @@ public class SenderBrokerJMS {
         @Autowired
         private JmsTemplate JmsTemp;
         
-        @Value("CodaBarBroker") //Da aggiungere
+        @Value("CodaBarBroker") 
         private String realizzatorProxyQueue;
         
         @Value("CodaCamerieriBroker")
-        private String waitersProxyQueue;
+        private String waitersQueueBroker;
         
         @Value("CodaAccoglienzaBroker")
-        private String acceptaceProxyQueue;
+        private String acceptanceQueueBroker;
         
-        
-        public enum queuesBroker{
-        	realizzatorProxyQueue,
-        	acceptanceProxyQueue,
-        	waitersProxyQueue;
-        }
-        
-        public void send(String nomeCoda,String message) {
+        public enum proxySou
+        /**
+         * 
+         * @info : Base function to send something in a queue
+         * @param queueName
+         * @param message
+         * 
+         */
+        public void send(String queueName,String message) {
         	JmsTemp.convertAndSend(nomeCoda+"Broker",message);
-        }       
+        }   
+        
+        public void sendMenuRequest(String message) {
+        	this.send(waitersQueueBroker,message);
+        }
+        public void sendTableRequest(String message) {
+        	this.send(waitersQueueBroker,message);
+        }
 }

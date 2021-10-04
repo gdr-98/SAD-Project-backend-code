@@ -89,8 +89,6 @@ public class SystemController  extends GeneralController implements controllerIf
 			else {
 				obj.result=results.roleFailed.name();
 			}
-			menuRequest o2=gson.fromJson( gson.toJson(obj,menuRequest.class),
-					menuRequest.class);
 			this.brokerIface.publishResponse(gson.toJson(obj,menuRequest.class));
 			
 	}
@@ -180,7 +178,7 @@ public class SystemController  extends GeneralController implements controllerIf
 		}
 		this.brokerIface.publishResponse(gson.toJson(obj,tableOperation.class));
 	}
-	
+
 	/**
 	 * @info a table must be freed
 	 * @param Request, alter a table state and publish the response to the broker
