@@ -1,0 +1,24 @@
+package broker;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.google.gson.Gson;
+
+import messages.baseMessage;
+
+import controller.BrokerInterface;
+
+@Service("brokerDispatcher")
+public class DispatcherBroker implements BrokerInterface{
+	
+	@Autowired
+	public SenderBrokerJMS sender;
+	
+	@Override
+	public void publishResponse(String response) {
+		Gson gson=new Gson();
+		baseMessage helper=gson.fromJson(response,baseMessage.class);
+		sender.send(helper.proxySource+"Broker",response);
+	}
+}
