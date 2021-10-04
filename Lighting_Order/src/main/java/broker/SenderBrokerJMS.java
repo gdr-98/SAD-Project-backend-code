@@ -36,7 +36,12 @@ public class SenderBrokerJMS {
         	JmsTemp.convertAndSend(queueName,message);
         }   
         
-        public void sendMenuRequest(String message) {
+        /*
+         * In pratica è usata per tutti i messaggi di conferma ai camerieri come 
+         * table requests, cancelOrder e canncelOrderedItems...
+         * Solo messaggi di conferma operazione o di inoltro di dati
+         */
+        public void sendWaitersConfirmation(String message) {
         	this.send(waitersQueueBroker,message);
         }
         
@@ -52,11 +57,27 @@ public class SenderBrokerJMS {
         public void sendOrderToBar(String message) {
         	this.send(barQueueBroker,message);
         }
-      
-        
-        public void sendTableRequest(String message) {
-        	//Richiesta che può essere fatta da entrambi, solo proxy con id risponde bene 
-        	this.send(waitersQueueBroker,message);
+       
+        /**
+         * Eventi di eseguita operazionne/conferma da inviare agli addetti all'accoglienza
+         */
+        public void sendAcceptanceConfirmation(String message) {
         	this.send(acceptanceQueueBroker, message);
         }
+          
+        /**
+         * Un cliente si è seduto ad un tavolo, questa è la notifica che arriva ad un cameriere
+         */
+        public void notifyWaitersForTable(String message) {
+        	this.send(waitersQueueBroker, message);
+        }
+        
+        /**
+         * Invia un messaggio di avvenuta operazione per un realizzatore
+         */
+    	public void sendRealizzatorConfirmation(String message) {
+    		this.send(bakeryQueueBroker,message);
+    		this.send(barQueueBroker,message);
+    		this.send(kitchenQueueBroker,message);
+    	}
 }
