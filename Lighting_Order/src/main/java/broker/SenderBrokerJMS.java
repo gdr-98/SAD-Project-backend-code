@@ -20,21 +20,20 @@ public class SenderBrokerJMS {
         @Value("CodaAccoglienzaBroker")
         private String acceptanceQueueBroker;
         
-        public enum proxySou
         /**
          * 
          * @info : Base function to send something in a queue
          * @param queueName
          * @param message
-         * 
          */
         public void send(String queueName,String message) {
-        	JmsTemp.convertAndSend(nomeCoda+"Broker",message);
+        	JmsTemp.convertAndSend(queueName,message);
         }   
         
         public void sendMenuRequest(String message) {
         	this.send(waitersQueueBroker,message);
         }
+        
         public void sendTableRequest(String message) {
         	this.send(waitersQueueBroker,message);
         }

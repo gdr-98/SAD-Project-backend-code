@@ -19,6 +19,15 @@ public class DispatcherBroker implements BrokerInterface{
 	public void publishResponse(String response) {
 		Gson gson=new Gson();
 		baseMessage helper=gson.fromJson(response,baseMessage.class);
-		sender.send(helper.proxySource+"Broker",response);
+		switch (helper.request){
+		
+		case "menuRequest":
+			sender.sendMenuRequest(response);
+			break;
+		
+		default: //Invalid request
+			break;
+		
+		}
 	}
 }
