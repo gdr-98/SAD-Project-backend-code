@@ -25,8 +25,6 @@ import java.util.regex.Pattern;
 @Service
 public class ReceiverJMS implements MessageListener {
 
-    public Webhook webhook = new Webhook();
-
     private final Post poster = new Post();
 
     private final Logger log = LoggerFactory.getLogger(ReceiverJMS.class);
@@ -63,6 +61,7 @@ public class ReceiverJMS implements MessageListener {
                 break;
 
             default:
+                log.info("Message does not match with any of the expected ones");
                 break;
         }
 

@@ -61,12 +61,12 @@ public class ReceiverJMS implements MessageListener {
                 break;
 
             case "menuRequest" : case "cancelOrderedItemRequest" : case "orderToTableGenerationRequest" :
-                case "cancelOrderRequest" :
+                case "cancelOrderRequest" : case "orderRequest" : case "itemWorkingRequest" :
                 poster.createPost("http://"+ Webhook.Waiters.get(msg_received.user)+"/notification",msg_to_send);
                 break;
 
             default :
-                log.info("Message do not match with any of the expected ones");
+                log.info("Message does not match with any of the expected ones");
 
         }
 
