@@ -1,6 +1,5 @@
-package com.project.Proxy.ProxyCameriere.JMS;
+package com.project.Proxy.ProxyAccoglienza.JMS;
 
-import com.project.Proxy.web.BaseMessage;
 import com.project.Proxy.web.LoginResponse;
 import com.project.Proxy.web.Post;
 import com.project.Proxy.web.Webhook;
@@ -17,7 +16,7 @@ public class LoginReceiverJMS implements MessageListener {
 
     private final Post poster = new Post();
 
-    @JmsListener(destination = "CodaLoginCamerieri")
+    @JmsListener(destination = "CodaLoginAccoglienza")
     @Override
     public void onMessage(@NotNull Message message) {
 
@@ -27,8 +26,7 @@ public class LoginReceiverJMS implements MessageListener {
         } catch (JMSException ex) {
             ex.printStackTrace();
         }
-
-        Webhook.Waiters.put(msg_received.user, msg_received.url);
+        Webhook.Acceptance.put(msg_received.user, msg_received.url);
 
         poster.createPost("http://"+ msg_received.url+"/login","Login successful");
     }

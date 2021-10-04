@@ -1,6 +1,7 @@
 package com.project.Proxy.ProxyAccoglienza.JMS;
 
 import com.google.gson.Gson;
+import com.project.Proxy.web.BaseMessage;
 import com.project.Proxy.web.Post;
 import com.project.Proxy.web.Webhook;
 import org.jetbrains.annotations.NotNull;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,12 +37,33 @@ public class ReceiverJMS implements MessageListener {
         /*
          * Retrieve body of the message sent by ActiveMQ.
          */
-        String message_type = "";
-        String msg_received = "";
+        String msg_to_send = "";
+        BaseMessage msg_received = new BaseMessage();
         try {
-            msg_received = (String) message.getBody(Object.class);
+            msg_received = (BaseMessage) message.getBody(Object.class);
+            msg_to_send = (String) message.getBody(Object.class);
         } catch (JMSException ex) {
             ex.printStackTrace();
+        }
+
+        /*
+        tableRequest,
+        freeTableRequest,
+         */
+
+        switch (msg_received.request) {
+            case "tableRequest" :
+                poster.createPost("http://"+ Webhook.Acceptance.get(msg_received.user)+"/notification",msg_to_send);
+                break;
+
+            case "freeTableRequest":
+                for (Map.Entry<String, String> me : Webhook.Acceptance.entrySet()) {
+                    poster.createPost("http://"+ me.getValue()+"/notification",msg_to_send);
+                }
+                break;
+
+            default:
+                break;
         }
 
         log.info("Event received: " + msg_received);
