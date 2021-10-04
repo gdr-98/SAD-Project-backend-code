@@ -1,8 +1,8 @@
-package com.project.Proxy.ProxyCameriere.JMS;
+package com.project.ProxyCameriere.ProxyCameriere.ProxyCameriere.JMS;
 
-import com.project.Proxy.web.BaseMessage;
-import com.project.Proxy.web.Post;
-import com.project.Proxy.web.Webhook;
+import com.project.ProxyCameriere.ProxyCameriere.web.BaseMessage;
+import com.project.ProxyCameriere.ProxyCameriere.web.Post;
+import com.project.ProxyCameriere.ProxyCameriere.web.Webhook;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

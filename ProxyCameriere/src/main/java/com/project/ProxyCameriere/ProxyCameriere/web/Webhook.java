@@ -1,4 +1,4 @@
-package com.project.Proxy.web;
+package com.project.ProxyCameriere.ProxyCameriere.web;
 
 import java.util.HashMap;
 

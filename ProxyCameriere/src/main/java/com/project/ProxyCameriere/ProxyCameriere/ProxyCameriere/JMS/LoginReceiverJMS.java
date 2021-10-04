@@ -1,9 +1,9 @@
-package com.project.Proxy.ProxyCameriere.JMS;
+package com.project.ProxyCameriere.ProxyCameriere.ProxyCameriere.JMS;
 
-import com.project.Proxy.web.BaseMessage;
-import com.project.Proxy.web.LoginResponse;
-import com.project.Proxy.web.Post;
-import com.project.Proxy.web.Webhook;
+import com.project.ProxyCameriere.ProxyCameriere.web.BaseMessage;
+import com.project.ProxyCameriere.ProxyCameriere.web.LoginResponse;
+import com.project.ProxyCameriere.ProxyCameriere.web.Post;
+import com.project.ProxyCameriere.ProxyCameriere.web.Webhook;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Service;

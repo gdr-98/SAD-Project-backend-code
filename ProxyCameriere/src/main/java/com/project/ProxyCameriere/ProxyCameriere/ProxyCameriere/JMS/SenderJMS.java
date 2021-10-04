@@ -1,4 +1,4 @@
-package com.project.Proxy.ProxyCameriere.JMS;
+package com.project.ProxyCameriere.ProxyCameriere.ProxyCameriere.JMS;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

@@ -1,4 +1,4 @@
-package com.project.Proxy.web;
+package com.project.ProxyCameriere.ProxyCameriere.web;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;

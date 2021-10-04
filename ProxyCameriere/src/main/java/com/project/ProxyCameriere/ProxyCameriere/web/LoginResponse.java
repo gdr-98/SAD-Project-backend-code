@@ -1,4 +1,4 @@
-package com.project.Proxy.web;
+package com.project.ProxyCameriere.ProxyCameriere.web;
 
 public class LoginResponse extends BaseMessage{
         public String user;

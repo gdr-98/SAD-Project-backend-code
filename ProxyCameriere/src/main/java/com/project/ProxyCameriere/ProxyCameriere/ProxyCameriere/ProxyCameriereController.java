@@ -1,8 +1,9 @@
-package com.project.Proxy.ProxyCameriere;
+package com.project.ProxyCameriere.ProxyCameriere.ProxyCameriere;
 
-import com.project.Proxy.ProxyCameriere.JMS.LoginReceiverJMS;
-import com.project.Proxy.ProxyCameriere.JMS.ReceiverJMS;
-import com.project.Proxy.ProxyCameriere.JMS.SenderJMS;
+
+import com.project.ProxyCameriere.ProxyCameriere.ProxyCameriere.JMS.ReceiverJMS;
+import com.project.ProxyCameriere.ProxyCameriere.ProxyCameriere.JMS.SenderJMS;
+import com.project.ProxyCameriere.ProxyCameriere.ProxyCameriere.JMS.LoginReceiverJMS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
