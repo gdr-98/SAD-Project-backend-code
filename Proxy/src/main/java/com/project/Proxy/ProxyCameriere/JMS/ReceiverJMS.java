@@ -56,7 +56,7 @@ public class ReceiverJMS implements MessageListener {
             case "itemCompleteRequest" :
 
             case "userWaitingForOrderRequest" :
-                for (Map.Entry me : Webhook.Waiters.entrySet()) {
+                for (Map.Entry<String, String> me : Webhook.Waiters.entrySet()) {
                      poster.createPost("http://"+ me.getValue()+"/notification",msg_to_send);
                 }
                 break;
