@@ -51,25 +51,18 @@ public class ReceiverJMS implements MessageListener {
                 cancelOrderRequest,     [1]
                 cancelOrderedItemRequest,   [1]*/
 
+
         switch (msg_received.request){
 
-            case "itemCompleteRequest" :
-
-            case "userWaitingForOrderRequest" :
+            case "itemCompleteRequest" : case "userWaitingForOrderRequest" :
                 for (Map.Entry<String, String> me : Webhook.Waiters.entrySet()) {
                      poster.createPost("http://"+ me.getValue()+"/notification",msg_to_send);
                 }
                 break;
 
-            case "menuRequest" :
-
-            case "cancelOrderedItemRequest" :
-
-            case "orderToTableGenerationRequest" :
-
-            case "cancelOrderRequest" :
-                url = Webhook.Waiters.get(msg_received.user);
-                poster.createPost("http://"+ url +"/notification",msg_to_send);
+            case "menuRequest" : case "cancelOrderedItemRequest" : case "orderToTableGenerationRequest" :
+                case "cancelOrderRequest" :
+                poster.createPost("http://"+ Webhook.Waiters.get(msg_received.user)+"/notification",msg_to_send);
                 break;
 
             default :

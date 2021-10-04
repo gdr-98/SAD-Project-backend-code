@@ -21,5 +21,10 @@ public class ReceiverJMS implements MessageListener {
         } catch (JMSException ex) {
             ex.printStackTrace();
         }
+
+        /*
+        orderRequest,
+        itemWorkingRequest,
+         */
     }
 }
