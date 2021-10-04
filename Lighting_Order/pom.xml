@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.lightingorder</groupId>
 	<artifactId>lighting_order</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.2-SNAPSHOT</version>
 	<name>Lighting_Order</name>
 	<description>Application for Restaurant Order Management</description>
 	<properties>
@@ -50,11 +50,6 @@
                     <artifactId>junit</artifactId>
                 </exclusion>
             </exclusions>
-		</dependency>
-		<dependency>
-		<!--   -->
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-artemis</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

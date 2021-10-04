@@ -28,6 +28,6 @@ public class SenderBrokerJMS {
         }
         
         public void send(String nomeCoda,String message) {
-        	JmsTemp.convertAndSend(nomeCoda,message);
+        	JmsTemp.convertAndSend(nomeCoda+"Broker",message);
         }       
 }

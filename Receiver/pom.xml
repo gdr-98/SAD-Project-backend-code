@@ -14,7 +14,7 @@
 	<name>Receiver</name>
 	<description>Receiver for Artemis</description>
 	<properties>
-		<java.version>17</java.version>
+		<java.version>11</java.version>
 	</properties>
 	<dependencies>
 		<dependency>

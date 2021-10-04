@@ -10,13 +10,15 @@ import messages.menuRequest;
 import messages.orderRequest;
 import messages.tableOperation;
 import messages.tableRequest;
-
+import request_generator.controllerIface;
 
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.stereotype.Service;
 import com.google.gson.Gson;
 
 
@@ -24,22 +26,24 @@ import com.google.gson.Gson;
  * @info: the controller that the system uses
  */
 
-@Service
-public class SystemController  extends GeneralController{
-	
+@Service("SystemController")
+@ComponentScan(basePackages= {"MenuAndWareHouseArea","UsersData","RestaurantArea","broker"})
+public class SystemController  extends GeneralController implements controllerIface {
+	@Autowired
+	@Qualifier("brokerDispatcher")
 	private BrokerInterface brokerIface;
 	/**
 	 * 
 	 * @param iface sets the broker interface object for the broker callback methods
 	 */
-	public void setBrokerListener(BrokerInterface iface) {
-		this.brokerIface=iface;
-	}
+	
 	@Autowired
 	public SystemController(MenuAndGoodsController controllerMenu,
-			RestaurantController controllerRestaurant,UsersController usersController) {
+			RestaurantController controllerRestaurant,UsersController usersController
+			) {
 		super(controllerMenu,controllerRestaurant,usersController);
 	}
+	
 	
 	private enum results{
 		roleFailed,
@@ -68,11 +72,11 @@ public class SystemController  extends GeneralController{
 	 * 					response: requestedMenuItems
 	 * 				}
 	 */
-	public void menuRequest(String request) {
+	@Override
+	public void menuRequest( String request) {
 			Gson gson=new Gson();
 			menuRequest obj=gson.fromJson(request, menuRequest.class);
 			//checking the role of the request
-		
 			if(this.usersController.checkRole(
 					obj.user
 					,UsersData.User.userRoles.Cameriere.name() ))
@@ -85,7 +89,10 @@ public class SystemController  extends GeneralController{
 			else {
 				obj.result=results.roleFailed.name();
 			}
+			menuRequest o2=gson.fromJson( gson.toJson(obj,menuRequest.class),
+					menuRequest.class);
 			this.brokerIface.publishResponse(gson.toJson(obj,menuRequest.class));
+			
 	}
 	
 	
@@ -106,6 +113,7 @@ public class SystemController  extends GeneralController{
 	 * 					response: requestedTables
 	 * 					}
 	 */
+	@Override
 	public void tableRequest(String request) {
 		Gson gson=new Gson();
 		tableRequest obj=gson.fromJson(request,tableRequest.class);
@@ -152,6 +160,7 @@ public class SystemController  extends GeneralController{
 	 * 					response:tableJsonRepresentation
 	 * 				}
 	 */
+	@Override
 	public void userWaitingForOrderRequest(String request) {
 		Gson gson=new Gson();
 		tableOperation obj=gson.fromJson(request, tableOperation.class);
@@ -189,6 +198,7 @@ public class SystemController  extends GeneralController{
 	 * 					response:tableJsonRepresentation
 	 * 				}
 	 */
+	@Override
 	public void freeTableRequest(String request) {
 		Gson gson=new Gson();
 		tableOperation obj=gson.fromJson(request, tableOperation.class);
@@ -233,6 +243,7 @@ public class SystemController  extends GeneralController{
 	 * 					response: empty
 	 * 				}
 	 */
+	@Override
 	public void orderToTableGenerationRequest(String request) {
 		Gson gson=new Gson();
 		messages.orderToTableGenerationRequest obj=gson.fromJson(request,
@@ -274,6 +285,7 @@ public class SystemController  extends GeneralController{
 	 * 					response:true/false
 	 *				}
 	 */
+	@Override
 	public void cancelOrderRequest(String request) {
 		Gson gson=new Gson();
 		cancelOrderRequest obj=gson.fromJson(request, cancelOrderRequest.class);
@@ -309,6 +321,7 @@ public class SystemController  extends GeneralController{
 	 * 					response:true/false
 	 *				}
 	 */
+	@Override
 	public void cancelOrderedItemRequest(String request) {
 		Gson gson=new Gson();
 		itemOpRequest obj=gson.fromJson(request, itemOpRequest.class);
@@ -329,7 +342,7 @@ public class SystemController  extends GeneralController{
 		this.brokerIface.publishResponse(gson.toJson(obj,messages.
 															itemOpRequest.class));
 	}
-	
+	@Override
 	public void itemWorkingRequest(String request) {
 		
 		Gson gson=new Gson();
@@ -352,7 +365,7 @@ public class SystemController  extends GeneralController{
 															itemOpRequest.class));
 		
 	}
-	
+	@Override
 	public void itemCompleteRequest(String request) {
 		
 		Gson gson=new Gson();
@@ -374,7 +387,7 @@ public class SystemController  extends GeneralController{
 		this.brokerIface.publishResponse(gson.toJson(obj,messages.
 															itemOpRequest.class));
 	}
-	
+	@Override
 	public void orderRequest(String request) {
 		Gson gson=new Gson();
 		orderRequest obj=gson.fromJson(request, orderRequest.class);
@@ -404,5 +417,12 @@ public class SystemController  extends GeneralController{
 		}
 		this.brokerIface.publishResponse(gson.toJson(obj,orderRequest.class));
 	
+	}
+
+
+	@Override
+	public void loginRequest(String request) {
+		// TODO Auto-generated method stub
+		
 	}
 }

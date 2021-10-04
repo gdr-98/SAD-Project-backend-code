@@ -7,9 +7,10 @@ import java.util.Optional;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.stereotype.Service;
 
 import DataAccess.UserDAOPSQL;
-
+@Service
 public class UsersController {
 	
 	public enum ErrorCode {
@@ -23,7 +24,8 @@ public class UsersController {
 	private ErrorCode ec;
 
 	UsersController() {
-		users = new ArrayList<User>();
+		//users = new ArrayList<User>();
+		loginAll();
 	}
 	
 	public List<String> login(String id) {

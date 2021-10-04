@@ -8,12 +8,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.ComponentScan;
 //import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
  * */
 @Service
+@ComponentScan(basePackages= {"DataAccess"})
 public class MenuAndGoodsController { //Aggiornato il nome con conseguente aggiunta di lettere maiuscole !
 	
 	private List<MenuItem> menuItems=new ArrayList<MenuItem>();

@@ -1,6 +1,8 @@
+
 package request_generator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Controller;
 
 import com.google.gson.Gson;
@@ -16,11 +18,12 @@ import messages.tableOperation;
 import messages.tableRequest;
 
 @Controller
+@ComponentScan(basePackages= {"cotroller"})
 public class DispatcherInfo {
-	
 	private controllerIface controllerFunctions;
+	
 	@Autowired
-	public DispatcherInfo(@Qualifier("controllerIfaceImpl") controllerIface input) {
+	public DispatcherInfo(@Qualifier("SystemController") controllerIface input) {
 		this.controllerFunctions=input;
 	}
     public void callerFactory(String mex) {
