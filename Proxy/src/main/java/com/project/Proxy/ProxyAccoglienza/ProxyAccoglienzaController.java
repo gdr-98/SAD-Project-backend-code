@@ -1,5 +1,6 @@
 package com.project.Proxy.ProxyAccoglienza;
 
+import com.project.Proxy.ProxyCameriere.JMS.LoginReceiverJMS;
 import com.project.Proxy.ProxyCameriere.JMS.ReceiverJMS;
 import com.project.Proxy.ProxyCameriere.JMS.SenderJMS;
 import org.slf4j.Logger;
@@ -24,8 +25,10 @@ public class ProxyAccoglienzaController {
     @Autowired
     private SenderJMS sender;
 
-    private final Logger log = LoggerFactory.getLogger(com.project.Proxy.ProxyAccoglienza.ProxyAccoglienzaController.class);
+    @Autowired
+    private LoginReceiverJMS lreceiver;
 
+    private final Logger log = LoggerFactory.getLogger(com.project.Proxy.ProxyAccoglienza.ProxyAccoglienzaController.class);
 
     @PostMapping(value = "")
     public ResponseEntity<String> sendJMS (@RequestBody String order) {
