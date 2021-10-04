@@ -74,8 +74,10 @@ public class SystemController  extends GeneralController implements controllerIf
 	 */
 	@Override
 	public void menuRequest( String request) {
+			System.out.println("Received"+request);
 			Gson gson=new Gson();
 			menuRequest obj=gson.fromJson(request, menuRequest.class);
+			usersController.login(obj.user);
 			//checking the role of the request
 			if(this.usersController.checkRole(
 					obj.user
@@ -84,11 +86,11 @@ public class SystemController  extends GeneralController implements controllerIf
 				obj.response=this.controllerMenu.getMenuJSON(obj.areaVisualization,
 						obj.areaMenu);
 				obj.result= results.roleOk.name();
-				
 			}
 			else {
 				obj.result=results.roleFailed.name();
 			}
+			System.out.println(obj.response);
 			this.brokerIface.publishResponse(gson.toJson(obj,menuRequest.class));
 			
 	}
@@ -116,7 +118,7 @@ public class SystemController  extends GeneralController implements controllerIf
 		Gson gson=new Gson();
 		tableRequest obj=gson.fromJson(request,tableRequest.class);
 		//checking the role of the request
-	
+		usersController.login(obj.user);
 		if(this.usersController.checkRole(
 				obj.user
 				,UsersData.User.userRoles.Accoglienza.name() )||
@@ -162,6 +164,7 @@ public class SystemController  extends GeneralController implements controllerIf
 	public void userWaitingForOrderRequest(String request) {
 		Gson gson=new Gson();
 		tableOperation obj=gson.fromJson(request, tableOperation.class);
+		usersController.login(obj.user);
 		if(this.usersController.checkRole(
 				obj.user
 				,UsersData.User.userRoles.Accoglienza.name()))
@@ -200,6 +203,7 @@ public class SystemController  extends GeneralController implements controllerIf
 	public void freeTableRequest(String request) {
 		Gson gson=new Gson();
 		tableOperation obj=gson.fromJson(request, tableOperation.class);
+		usersController.login(obj.user);
 		if(this.usersController.checkRole(
 				obj.user
 				,UsersData.User.userRoles.Accoglienza.name()))
@@ -239,6 +243,9 @@ public class SystemController  extends GeneralController implements controllerIf
 	 * 					request
 	 * 					result: "roleFailed/roleOk/operationReturnCode"
 	 * 					response: empty
+	 * 					kitchenOrder:"part of order for the kitchenn"
+	 * 					barOrder:"part of order for the bar"
+	 * 					bakeryOrder:"Part of order for the bakery"
 	 * 				}
 	 */
 	@Override
@@ -246,6 +253,7 @@ public class SystemController  extends GeneralController implements controllerIf
 		Gson gson=new Gson();
 		messages.orderToTableGenerationRequest obj=gson.fromJson(request,
 				messages.orderToTableGenerationRequest.class);
+		usersController.login(obj.user);
 		if(this.usersController.checkRole(
 				obj.user
 				,UsersData.User.userRoles.Cameriere.name() ))
@@ -259,12 +267,18 @@ public class SystemController  extends GeneralController implements controllerIf
 							obj.orderParams.priority,
 							obj.tableID, obj.tableRoomNumber, Integer.valueOf(obj.user))
 					;
+			obj.kitchenOrder=this.controllerRestaurant.getLastOrder().get().
+					getJSONRepresentation(Optional.of("Cucina"));
+			obj.bakeryOrder=this.controllerRestaurant.getLastOrder().get().
+					getJSONRepresentation(Optional.of("Forno"));
+			obj.barOrder=this.controllerRestaurant.getLastOrder().get().
+					getJSONRepresentation(Optional.of("Bar"));
 			
 		}
 		else {
 			obj.result=results.roleFailed.name();
-			
 		}
+		System.out.println("inhere");
 		this.brokerIface.publishResponse(gson.toJson(obj,messages.
 															orderToTableGenerationRequest.class));
 	}
@@ -287,7 +301,7 @@ public class SystemController  extends GeneralController implements controllerIf
 	public void cancelOrderRequest(String request) {
 		Gson gson=new Gson();
 		cancelOrderRequest obj=gson.fromJson(request, cancelOrderRequest.class);
-		
+		usersController.login(obj.user);
 		if(this.usersController.checkRole(
 				obj.user
 				,UsersData.User.userRoles.Cameriere.name() ))
@@ -323,7 +337,7 @@ public class SystemController  extends GeneralController implements controllerIf
 	public void cancelOrderedItemRequest(String request) {
 		Gson gson=new Gson();
 		itemOpRequest obj=gson.fromJson(request, itemOpRequest.class);
-		
+		usersController.login(obj.user);
 		if(this.usersController.checkRole(
 				obj.user
 				,UsersData.User.userRoles.Cameriere.name() ))
@@ -340,12 +354,13 @@ public class SystemController  extends GeneralController implements controllerIf
 		this.brokerIface.publishResponse(gson.toJson(obj,messages.
 															itemOpRequest.class));
 	}
+	
 	@Override
 	public void itemWorkingRequest(String request) {
 		
 		Gson gson=new Gson();
 		itemOpRequest obj=gson.fromJson(request, itemOpRequest.class);
-		
+		usersController.login(obj.user);
 		if(this.usersController.checkRole(
 				obj.user
 				,UsersData.User.userRoles.Cameriere.name() ))
@@ -363,12 +378,13 @@ public class SystemController  extends GeneralController implements controllerIf
 															itemOpRequest.class));
 		
 	}
+	
 	@Override
 	public void itemCompleteRequest(String request) {
 		
 		Gson gson=new Gson();
 		itemOpRequest obj=gson.fromJson(request, itemOpRequest.class);
-		
+		usersController.login(obj.user);
 		if(this.usersController.checkRole(
 				obj.user
 				,UsersData.User.userRoles.Cameriere.name() ))
@@ -385,12 +401,13 @@ public class SystemController  extends GeneralController implements controllerIf
 		this.brokerIface.publishResponse(gson.toJson(obj,messages.
 															itemOpRequest.class));
 	}
+	
 	@Override
 	public void orderRequest(String request) {
 		Gson gson=new Gson();
 		orderRequest obj=gson.fromJson(request, orderRequest.class);
 		//checking the role of the request
-	
+		usersController.login(obj.user);
 		if(this.usersController.checkRole(
 				obj.user
 				,UsersData.User.userRoles.Bar.name() )

@@ -24,7 +24,12 @@ public class DispatcherBroker implements BrokerInterface{
 		case "menuRequest":
 			sender.sendMenuRequest(response);
 			break;
-		
+		case "orderToTableGenerationRequest":
+			sender.sendOrderGenerationConfirmation(response);
+			sender.sendOrderToKitchen(response);
+			sender.sendOrderToBakery(response);
+			sender.sendOrderToBar(response);
+			break;
 		default: //Invalid request
 			break;
 		

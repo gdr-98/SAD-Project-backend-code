@@ -24,8 +24,7 @@ public class UsersController {
 	private ErrorCode ec;
 
 	UsersController() {
-		//users = new ArrayList<User>();
-		loginAll();
+		users = new ArrayList<User>();
 	}
 	
 	public List<String> login(String id) {

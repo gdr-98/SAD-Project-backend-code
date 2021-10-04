@@ -18,4 +18,10 @@ public class orderToTableGenerationRequest extends baseMessage {
 		public List<Integer>  priority;
 	}
 	public  orderParameters orderParams;
+	/**
+	 * These parts of the message can be empty,check !
+	 */
+	public String kitchenOrder;
+	public String barOrder;
+	public String bakeryOrder;
 }

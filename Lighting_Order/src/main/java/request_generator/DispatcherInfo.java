@@ -18,7 +18,7 @@ import messages.tableOperation;
 import messages.tableRequest;
 
 @Controller
-@ComponentScan(basePackages= {"cotroller"})
+@ComponentScan(basePackages= {"controller"})
 public class DispatcherInfo {
 	private controllerIface controllerFunctions;
 	
@@ -29,39 +29,42 @@ public class DispatcherInfo {
     public void callerFactory(String mex) {
     	
     	Gson gson=new Gson();
+    	
     	baseMessage rec=gson.fromJson(mex, baseMessage.class);	
     	
     	if(rec.request.equals(controllerIface.requests.tableRequest.name()))
-    		controllerFunctions.tableRequest(gson.toJson(mex,tableRequest.class));
+    		controllerFunctions.tableRequest(mex);
     	
     	else if(rec.request.equals(controllerIface.requests.userWaitingForOrderRequest.name()))
-    		controllerFunctions.userWaitingForOrderRequest(gson.toJson(mex,tableOperation.class));
+    		controllerFunctions.userWaitingForOrderRequest(mex);
     	
     	else if(rec.request.equals(controllerIface.requests.freeTableRequest.name()))
-    		controllerFunctions.freeTableRequest(gson.toJson(mex,tableOperation.class));
+    		controllerFunctions.freeTableRequest(mex);
     	
     	else if(rec.request.equals(controllerIface.requests.itemCompleteRequest.name()))
-    		controllerFunctions.itemCompleteRequest(gson.toJson(mex,itemOpRequest.class));
+    		controllerFunctions.itemCompleteRequest(mex);
     	
     	else if(rec.request.equals(controllerIface.requests.itemWorkingRequest.name()))
-    		controllerFunctions.itemWorkingRequest(gson.toJson(mex,itemOpRequest.class));
+    		controllerFunctions.itemWorkingRequest(mex);
     	
     	else if(rec.request.equals(controllerIface.requests.orderRequest.name()))
-    		controllerFunctions.orderRequest(gson.toJson(mex,orderRequest.class));
+    		controllerFunctions.orderRequest(mex);
        	
-    	else if(rec.request.equals(controllerIface.requests.menuRequest.name()))
-    		controllerFunctions.menuRequest(gson.toJson(mex,menuRequest.class));
+    	else if(rec.request.equals(controllerIface.requests.menuRequest.name())) 
+    		controllerFunctions.menuRequest(mex);
+    	
        
     	else if(rec.request.equals(controllerIface.requests.orderToTableGenerationRequest.name()))
-    		controllerFunctions.orderToTableGenerationRequest(gson.toJson(mex,orderToTableGenerationRequest.class));
+    		controllerFunctions.orderToTableGenerationRequest(mex);
     	
     	else if(rec.request.equals(controllerIface.requests.cancelOrderRequest.name()))
-    		controllerFunctions.cancelOrderRequest(gson.toJson(mex,cancelOrderRequest.class));
+    		controllerFunctions.cancelOrderRequest(mex);
     	
     	else if(rec.request.equals(controllerIface.requests.cancelOrderedItemRequest.name()))
-    		controllerFunctions.cancelOrderedItemRequest(gson.toJson(mex,itemOpRequest.class));
+    		controllerFunctions.cancelOrderedItemRequest(mex);
     	
     	else if(rec.request.equals(controllerIface.requests.loginRequest.name()))
-    		controllerFunctions.loginRequest(gson.toJson(mex,loginRequest.class));  
+    		controllerFunctions.loginRequest(mex); 
+    		
     }
 }

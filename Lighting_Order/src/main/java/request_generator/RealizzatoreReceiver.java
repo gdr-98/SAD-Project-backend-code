@@ -23,7 +23,8 @@ public class RealizzatoreReceiver implements MessageListener {
     public void onMessage(Message message) {
         try {
             received = (String) message.getBody(String.class);
-            dispatcherInfo.callerFactory(received);
+            System.out.println(received);
+            //dispatcherInfo.callerFactory(received);
             
         } catch (JMSException ex) {
             ex.printStackTrace();

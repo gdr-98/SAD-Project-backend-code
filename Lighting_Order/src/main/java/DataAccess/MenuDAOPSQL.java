@@ -4,13 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.stereotype.Repository;
@@ -18,8 +15,6 @@ import org.springframework.stereotype.Repository;
 @Repository("psqlMenu")
 public class MenuDAOPSQL implements MenuAndWarehouseDAO {
 
-	@Autowired
-	private ApplicationContext context;
 	private JdbcTemplate database;
 	
 	public static final String DRIVER = "org.postgresql.Driver";
@@ -210,18 +205,5 @@ public class MenuDAOPSQL implements MenuAndWarehouseDAO {
 		for(Map<String,Object> record : results)
 			menu_items_name.add(record.get("name").toString());
 		return menu_items_name;
-	}
-	
-	@PostConstruct
-	public void check() {
-		if(context==null) {
-			System.out.println("true");
-		}
-		else {
-			System.out.println("nooo");
-		}
-		//MenuDAOPSQL list =context.getBeanNamesForType(MenuDAOPSQL.class);
-		String[]list=context.getBeanNamesForType(MenuDAOPSQL.class);
-		System.out.println("The list of orders is"+list[0]);
 	}
 }
