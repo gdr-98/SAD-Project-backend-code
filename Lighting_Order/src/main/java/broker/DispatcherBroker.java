@@ -30,6 +30,8 @@ public class DispatcherBroker implements BrokerInterface{
 			sender.sendOrderToBakery(response);
 			sender.sendOrderToBar(response);
 			break;
+		case "tableRequest":
+			sender.sendTableRequest(response);
 		default: //Invalid request
 			break;
 		

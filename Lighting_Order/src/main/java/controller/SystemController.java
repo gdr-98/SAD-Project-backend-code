@@ -102,9 +102,9 @@ public class SystemController  extends GeneralController implements controllerIf
 	 * 					user:"userID"
 	 * 					proxySource:"NameOfTheProxySource"
 	 * 					request:"tableRequest"
-	 * 					forRoom:"yes/no"
+	 * 					forRoom:"true/false"
 	 * 					roomNumber:"roomNumber"
-	 * 					showItemsInArea:"yes/no"
+	 * 					showItemsInArea:"true/false"
 	 * 					orderArea:"areaOfTheOrders"
 	 * 					}
 	 * 		response:	{

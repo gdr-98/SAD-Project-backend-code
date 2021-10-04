@@ -53,8 +53,10 @@ public class SenderBrokerJMS {
         	this.send(barQueueBroker,message);
         }
       
-        /*
+        
         public void sendTableRequest(String message) {
+        	//Richiesta che può essere fatta da entrambi, solo proxy con id risponde bene 
         	this.send(waitersQueueBroker,message);
-        }*/
+        	this.send(acceptanceQueueBroker, message);
+        }
 }
