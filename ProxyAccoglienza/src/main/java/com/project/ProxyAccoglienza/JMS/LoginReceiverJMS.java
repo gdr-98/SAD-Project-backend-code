@@ -1,8 +1,8 @@
-package com.project.Proxy.ProxyAccoglienza.JMS;
+package com.project.ProxyAccoglienza.JMS;
 
-import com.project.Proxy.web.LoginResponse;
-import com.project.Proxy.web.Post;
-import com.project.Proxy.web.Webhook;
+import com.project.ProxyAccoglienza.web.LoginResponse;
+import com.project.ProxyAccoglienza.web.Post;
+import com.project.ProxyAccoglienza.web.Webhook;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Service;
@@ -29,5 +29,6 @@ public class LoginReceiverJMS implements MessageListener {
         Webhook.Acceptance.put(msg_received.user, msg_received.url);
 
         poster.createPost("http://"+ msg_received.url+"/login","Login successful");
+        //in realtà nel body andrebbe inviato l'indirizzo del proxy in questione
     }
 }

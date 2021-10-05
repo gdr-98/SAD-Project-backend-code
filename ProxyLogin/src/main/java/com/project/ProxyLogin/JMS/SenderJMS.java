@@ -1,4 +1,4 @@
-package com.project.Proxy.ProxyAccoglienza.JMS;
+package com.project.ProxyLogin.JMS;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,12 +11,9 @@ public class SenderJMS {
         @Autowired
         private JmsTemplate JmsTemp;
 
-        @Value("CodaAccoglienza")
+        @Value("CodaLogin")
         private String JmsQueue;
 
-        /*
-         * Da testare come il sender invia oggetti JSON
-         */
         public void sendMessage (String order) {
             JmsTemp.convertAndSend(JmsQueue, order);
         }

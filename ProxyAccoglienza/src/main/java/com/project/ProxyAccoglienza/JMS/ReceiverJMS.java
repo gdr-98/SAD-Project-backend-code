@@ -1,9 +1,9 @@
-package com.project.Proxy.ProxyAccoglienza.JMS;
+package com.project.ProxyAccoglienza.JMS;
 
 import com.google.gson.Gson;
-import com.project.Proxy.web.BaseMessage;
-import com.project.Proxy.web.Post;
-import com.project.Proxy.web.Webhook;
+import com.project.ProxyAccoglienza.web.BaseMessage;
+import com.project.ProxyAccoglienza.web.Post;
+import com.project.ProxyAccoglienza.web.Webhook;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,11 +14,10 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
 
 /*
- * Listen queue "CodaCamerieriBroker" and if detect an event
+ * Listen queue "CodaAccoglienzaBroker" and if detect an event
  * notify every client registered to the webhook
  */
 
@@ -35,10 +34,15 @@ public class ReceiverJMS implements MessageListener {
         /*
          * Retrieve body of the message sent by ActiveMQ.
          */
+
         String msg_to_send = "";
+        String helper ;
         BaseMessage msg_received = new BaseMessage();
+        Gson gson = new Gson();
         try {
-            msg_received = (BaseMessage) message.getBody(Object.class);
+            helper = (String) message.getBody(String.class);
+            msg_received=gson.fromJson(helper,BaseMessage.class);
+            log.info("Returned is" +helper);
             msg_to_send = (String) message.getBody(Object.class);
         } catch (JMSException ex) {
             ex.printStackTrace();

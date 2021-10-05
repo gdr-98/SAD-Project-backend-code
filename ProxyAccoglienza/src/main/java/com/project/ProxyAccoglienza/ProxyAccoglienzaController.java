@@ -1,8 +1,9 @@
-package com.project.Proxy.ProxyAccoglienza;
+package com.project.ProxyAccoglienza;
 
-import com.project.Proxy.ProxyCameriere.JMS.LoginReceiverJMS;
-import com.project.Proxy.ProxyCameriere.JMS.ReceiverJMS;
-import com.project.Proxy.ProxyCameriere.JMS.SenderJMS;
+
+import com.project.ProxyAccoglienza.JMS.LoginReceiverJMS;
+import com.project.ProxyAccoglienza.JMS.ReceiverJMS;
+import com.project.ProxyAccoglienza.JMS.SenderJMS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,12 +29,12 @@ public class ProxyAccoglienzaController {
     @Autowired
     private LoginReceiverJMS lreceiver;
 
-    private final Logger log = LoggerFactory.getLogger(com.project.Proxy.ProxyAccoglienza.ProxyAccoglienzaController.class);
+    private final Logger log = LoggerFactory.getLogger(com.project.ProxyAccoglienza.ProxyAccoglienzaController.class);
 
-    @PostMapping(value = "")
-    public ResponseEntity<String> sendJMS (@RequestBody String order) {
-        log.info("ProxyAccoglienza message sent");
-        sender.sendMessage(order);
-        return new ResponseEntity<>("***", HttpStatus.OK);
+    @PostMapping(value = "/TableManagement")
+    public ResponseEntity<String> sendJMS (@RequestBody String msg) {
+        log.info("ProxyAccoglienza message received");
+        sender.sendMessage(msg);
+        return new ResponseEntity<>("[Table state update] - Request received from Proxy", HttpStatus.OK);
     }
 }

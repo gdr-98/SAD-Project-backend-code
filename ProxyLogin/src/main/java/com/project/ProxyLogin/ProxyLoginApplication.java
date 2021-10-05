@@ -1,4 +1,4 @@
-package com.project.ProxyLogin.ProxyLogin;
+package com.project.ProxyLogin;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

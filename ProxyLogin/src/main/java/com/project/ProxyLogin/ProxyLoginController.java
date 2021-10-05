@@ -1,6 +1,6 @@
-package com.project.Proxy.ProxyLogin;
+package com.project.ProxyLogin;
 
-import com.project.Proxy.ProxyLogin.JMS.SenderJMS;
+import com.project.ProxyLogin.JMS.SenderJMS;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,13 +15,13 @@ public class ProxyLoginController {
     SenderJMS sender;
 
     @PostMapping(value = "/login")
-    public ResponseEntity<String> login (@RequestBody String data) {
+    public ResponseEntity<String> login (@RequestBody String Login_msg) {
         /*  data:
             "id": pepped
             "url": 192.168.1.x:YYYY
         */
-        sender.sendMessage(data);
-        return new ResponseEntity<>("Login successful", HttpStatus.OK);
+        sender.sendMessage(Login_msg);  //Invio su CodaLogin
+        return new ResponseEntity<>("[Login Request] - Received from Proxy", HttpStatus.OK);
     }
 
 }
