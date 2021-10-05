@@ -3,12 +3,6 @@ package request_generator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Service;
-
-import com.google.gson.Gson;
-
-import messages.baseMessage;
-import messages.menuRequest;
-
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
