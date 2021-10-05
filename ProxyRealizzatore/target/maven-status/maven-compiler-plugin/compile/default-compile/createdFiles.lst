@@ -1,0 +1,11 @@
+com/project/ProxyRealizzatore/ProxyRealizzatore/SenderJMS.class
+com/project/ProxyRealizzatore/ProxyRealizzatore/ProxyChef/LoginReceiverChefJMS.class
+com/project/ProxyRealizzatore/ProxyRealizzatore/web/LoginResponse.class
+com/project/ProxyRealizzatore/ProxyRealizzatore/web/Webhook.class
+com/project/ProxyRealizzatore/ProxyRealizzatore/web/BaseMessage.class
+com/project/ProxyRealizzatore/ProxyRealizzatore/web/Post.class
+com/project/ProxyRealizzatore/ProxyRealizzatore/ProxyPizzaiolo/LoginReceiverPizzaioloJMS.class
+com/project/ProxyRealizzatore/ProxyRealizzatore/ProxyPizzaiolo/ReceiverPizzaioloJMS.class
+com/project/ProxyRealizzatore/ProxyRealizzatore/ProxyRealizzatoreApplication.class
+com/project/ProxyRealizzatore/ProxyRealizzatore/ProxyRealizzatoreController.class
+com/project/ProxyRealizzatore/ProxyRealizzatore/ProxyChef/ReceiverChefJMS.class
