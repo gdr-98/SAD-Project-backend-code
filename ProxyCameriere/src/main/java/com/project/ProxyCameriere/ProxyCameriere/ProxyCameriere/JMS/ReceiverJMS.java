@@ -1,5 +1,6 @@
 package com.project.ProxyCameriere.ProxyCameriere.ProxyCameriere.JMS;
 
+import com.fasterxml.jackson.databind.ser.Serializers;
 import com.google.gson.Gson;
 import com.project.ProxyCameriere.ProxyCameriere.web.BaseMessage;
 import com.project.ProxyCameriere.ProxyCameriere.web.Post;
@@ -35,14 +36,15 @@ public class ReceiverJMS implements MessageListener {
          */
 
         String url;
+        String helper;
         BaseMessage msg_received = new BaseMessage() ;
         String msg_to_send = "";
         Gson gson=new Gson();
         try {
-            String helper= (String) message.getBody(String.class);
-            msg_received=gson.fromJson(helper,BaseMessage.class);
-            log.info("Returned is" +helper);
-            msg_to_send = (String) message.getBody(Object.class);
+             helper= (String) message.getBody(String.class);
+             msg_received=gson.fromJson(helper,BaseMessage.class);
+             log.info("Returned is" +helper);
+             msg_to_send = (String) message.getBody(Object.class);
         } catch (JMSException ex) {
             ex.printStackTrace();
         }
@@ -57,21 +59,24 @@ public class ReceiverJMS implements MessageListener {
 
 
         switch (msg_received.request){
-
-            case "itemCompleteRequest" : case "userWaitingForOrderRequest" :
+            //In the case a client is waiting for ordination
+             case "userWaitingForOrderRequest" :
                 for (Map.Entry<String, String> me : Webhook.Waiters.entrySet()) {
                      poster.createPost("http://"+ me.getValue()+"/notification",msg_to_send);
                 }
                 break;
-
+            //Just a confirmation message to the event creator
             case "menuRequest" : case "cancelOrderedItemRequest" : case "orderToTableGenerationRequest" :
-                case "cancelOrderRequest" : case "orderRequest" : case "itemWorkingRequest" :
-                poster.createPost("http://"+ Webhook.Waiters.get(msg_received.user)+"/notification",msg_to_send);
-                break;
+                case "cancelOrderRequest" : case "tableRequest":
+                    if(Webhook.Waiters.containsKey(msg_received.user)) {
+                        poster.createPost("http://" + Webhook.Waiters.get(msg_received.user) + "/notification", msg_to_send);
+                        log.info(msg_to_send);
+                    }
+                    break;
 
             default :
                 log.info("Message does not match with any of the expected ones");
-
+                break;
         }
 
         log.info("Event received: ");

@@ -1,9 +1,11 @@
 package com.project.ProxyCameriere.ProxyCameriere.ProxyCameriere;
 
 
+import com.google.gson.Gson;
 import com.project.ProxyCameriere.ProxyCameriere.ProxyCameriere.JMS.ReceiverJMS;
 import com.project.ProxyCameriere.ProxyCameriere.ProxyCameriere.JMS.SenderJMS;
 import com.project.ProxyCameriere.ProxyCameriere.ProxyCameriere.JMS.LoginReceiverJMS;
+import com.project.ProxyCameriere.ProxyCameriere.web.BaseMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +32,7 @@ public class ProxyCameriereController {
     @Autowired
     private LoginReceiverJMS lreceiver;
 
+    private static final String name="waitersProxy";
     private final Logger log = LoggerFactory.getLogger(ProxyCameriereController.class);
 
     /*
@@ -48,14 +51,14 @@ public class ProxyCameriereController {
 
     /*
      * Example format:
-     * http://localhost:8080/sendorder
+     * http://localhost:8081/sendorder
      *
      * Post request must contain a not null body.
      */
-    @PostMapping (value = "/sendorder")
-    public ResponseEntity<String> sendJMS (@RequestBody String order) {
-        log.info("Order sent");
-        sender.sendMessage(order);
-        return new ResponseEntity<>("Order created", HttpStatus.OK);
+    @PostMapping (value = "/waitersSend")
+    public ResponseEntity<String> sendJMS (@RequestBody String event) {
+        sender.sendMessage(event);
+        log.info(event);
+        return new ResponseEntity<>("Event sent", HttpStatus.OK);
     }
 }
