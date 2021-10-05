@@ -56,27 +56,27 @@ public class ReceiverJMS implements MessageListener {
                 orderToTableGenerationRequest,  [1]
                 cancelOrderRequest,     [1]
                 cancelOrderedItemRequest,   [1]*/
+        /*
 
-/*
         switch (msg_received.request){
-
+            //In the case a client is waiting for ordination
              case "userWaitingForOrderRequest" :
                 for (Map.Entry<String, String> me : Webhook.Waiters.entrySet()) {
                      poster.createPost("http://"+ me.getValue()+"/notification",msg_to_send);
                 }
                 break;
-
+            //Just a confirmation message to the event creator
             case "menuRequest" : case "cancelOrderedItemRequest" : case "orderToTableGenerationRequest" :
-                case "cancelOrderRequest" : case "orderRequest" : case "itemWorkingRequest" :
+                case "cancelOrderRequest" :
                 poster.createPost("http://"+ Webhook.Waiters.get(msg_received.user)+"/notification",msg_to_send);
                 log.info(msg_to_send);
                 break;
 
             default :
                 log.info("Message does not match with any of the expected ones");
+                break;
+        }*/
 
-        }
-    */
         log.info("Event received: ");
     }
 }

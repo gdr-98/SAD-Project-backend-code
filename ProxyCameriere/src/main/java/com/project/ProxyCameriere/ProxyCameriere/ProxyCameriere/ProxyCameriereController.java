@@ -55,7 +55,7 @@ public class ProxyCameriereController {
      *
      * Post request must contain a not null body.
      */
-    @PostMapping (value = "/send")
+    @PostMapping (value = "/waitersSend")
     public ResponseEntity<String> sendJMS (@RequestBody String event) {
         sender.sendMessage(event);
         log.info(event);
