@@ -53,16 +53,17 @@ public class ReceiverJMS implements MessageListener {
         freeTableRequest,
         userWaitingForOrdersRequest
          */
-    /*
+
         switch (msg_received.request) {
             //Semplici messaggi di conferma che vanno al singolo
             case "tableRequest" : case "userWaitingForOrderRequest": case "freeTableRequest":
-                poster.createPost("http://"+ Webhook.Acceptance.get(msg_received.user)+"/notification",msg_to_send);
+                if(Webhook.Acceptance.containsKey(msg_received.user))
+                    poster.createPost("http://"+ Webhook.Acceptance.get(msg_received.user)+"/notification",msg_to_send);
                 break;
             default:
                 log.info("Message does not match with any of the expected ones");
                 break;
-        }*/
+        }
 
         log.info("Event received: " + msg_received);
     }

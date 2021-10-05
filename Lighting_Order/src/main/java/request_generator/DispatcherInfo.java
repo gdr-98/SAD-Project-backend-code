@@ -8,14 +8,6 @@ import org.springframework.stereotype.Controller;
 import com.google.gson.Gson;
 
 import messages.baseMessage;
-import messages.cancelOrderRequest;
-import messages.itemOpRequest;
-import messages.loginRequest;
-import messages.menuRequest;
-import messages.orderRequest;
-import messages.orderToTableGenerationRequest;
-import messages.tableOperation;
-import messages.tableRequest;
 
 @Controller
 @ComponentScan(basePackages= {"controller"})

@@ -24,8 +24,8 @@ public class DispatcherBroker implements BrokerInterface{
 		case "menuRequest" :case "cancelOrderRequest" :case "cancelOrderedItemRequest":
 			sender.sendWaitersConfirmation(response);
 			break;
-		//4
-		case "orderToTableGenerationRequest":
+		//4 
+		case "orderToTableGenerationRequest": 
 			sender.sendOrderGenerationConfirmation(response);
 			sender.sendOrderToKitchen(response);
 			sender.sendOrderToBakery(response);
@@ -47,8 +47,8 @@ public class DispatcherBroker implements BrokerInterface{
 			//I camerieri devono essere informati che un utente voglia ordinare
 			sender.notifyWaitersForTable(response);
 			break;
-		//8	9
-		case "itemComplete":case "ItemWorking":
+		//8	9 10 
+		case "itemCompleteRequest":case "itemWorkingRequest":case "orderRequest":
 			sender.sendRealizzatorConfirmation(response);
 			break;
 		

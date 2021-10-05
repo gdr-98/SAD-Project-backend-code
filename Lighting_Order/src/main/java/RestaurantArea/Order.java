@@ -113,7 +113,7 @@ public class Order {
 			
 			item.setPriority(singleItem.get("priority").getAsInt());
 			item.changeSubGoods(helperList);
-			
+			item.setLineNumber(singleItem.get("lineNumber").getAsInt());
 			//Ora lo stesso per le additive
 			helperList.clear();
 			helper1=singleItem.get("additive").getAsJsonArray();
@@ -122,7 +122,6 @@ public class Order {
 			item.changeAddGoods(helperList);
 			this.orderedItems.add(item);
 		}
-		
 		//register the order to the controller
 		this.controller.registerOrder(this);
 	}

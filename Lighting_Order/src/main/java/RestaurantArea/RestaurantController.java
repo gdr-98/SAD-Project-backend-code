@@ -484,10 +484,14 @@ public class RestaurantController {
 			if(this.orders.get(index).isMe(orderID)) {
 				check=true;
 				toRet=returnCodes.itemNotFound.name();
+				System.out.println(this.orders.get(index).getOrderedItems().get(0).getLineNumber());
+				System.out.println(this.orders.get(index).getOrderedItems().get(0).getItem().getName());
 				if(this.orders.get(index).hasItem(itemLineNumber))
 					return returnCodes.itemFound.name();
 			}
+			index++;
 		}
+		
 		return toRet;
 	}
 	

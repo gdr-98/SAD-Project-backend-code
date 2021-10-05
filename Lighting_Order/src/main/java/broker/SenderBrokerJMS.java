@@ -14,10 +14,10 @@ public class SenderBrokerJMS {
         @Value("CodaBarBroker") 
         private String barQueueBroker;
         
-        @Value("CodaFornoBroker") 
+        @Value("CodaPizzaioliBroker") 
         private String bakeryQueueBroker;
         
-        @Value("CodaCucinaBroker") 
+        @Value("CodaChefBroker") 
         private String kitchenQueueBroker;
         
         @Value("CodaCamerieriBroker")

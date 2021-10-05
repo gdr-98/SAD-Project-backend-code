@@ -265,7 +265,7 @@ public class SystemController  extends GeneralController implements controllerIf
 							obj.orderParams.addGoods,
 							obj.orderParams.subGoods, 
 							obj.orderParams.priority,
-							obj.tableID, obj.tableRoomNumber, Integer.valueOf(obj.user))
+							obj.tableId, obj.tableRoomNumber, Integer.valueOf(obj.user))
 					;
 			obj.kitchenOrder=this.controllerRestaurant.getLastOrder().get().
 					getJSONRepresentation(Optional.of("Cucina"));
@@ -354,16 +354,38 @@ public class SystemController  extends GeneralController implements controllerIf
 		this.brokerIface.publishResponse(gson.toJson(obj,messages.
 															itemOpRequest.class));
 	}
-	
+	/**
+	 * 
+	 * @param request
+	 *  request:	{
+	 * 					user:"userID"
+	 * 					proxySource:"NameOfTheProxySource"
+	 * 					request:"itemWorkingRequest"
+	 * 					orderID: "idOfTheOrder"
+	 * 					itemLineNumber:"itemLineNumber"
+	 * 				}
+	 * response		{
+	 * 					result:	roleOk/roleFailed/orderNotFound/itemFound/itemNotFound
+	 * 					response:true/false
+	 *				}
+	 */
 	@Override
 	public void itemWorkingRequest(String request) {
 		
 		Gson gson=new Gson();
 		itemOpRequest obj=gson.fromJson(request, itemOpRequest.class);
 		usersController.login(obj.user);
-		if(this.usersController.checkRole(
-				obj.user
-				,UsersData.User.userRoles.Cameriere.name() ))
+		if(	this.usersController.checkRole(
+						obj.user
+						,UsersData.User.userRoles.Bar.name() )
+				||this.usersController.checkRole(
+						obj.user
+						,UsersData.User.userRoles.Cucina.name())
+				||
+						this.usersController.checkRole(
+								obj.user
+								,UsersData.User.userRoles.Forno.name())
+			)
 		{
 			obj.result=this.controllerRestaurant.hasItem(obj.orderID,obj.itemLineNumber);
 			if(obj.result.equals(returnCodes.itemFound.name()))
@@ -379,16 +401,40 @@ public class SystemController  extends GeneralController implements controllerIf
 		
 	}
 	
+	/**
+	 * 
+	 * @param request
+	 *  request:	{
+	 * 					user:"userID"
+	 * 					proxySource:"NameOfTheProxySource"
+	 * 					request:"itemCompleteRequest"
+	 * 					orderID: "idOfTheOrder"
+	 * 					itemLineNumber:"itemLineNumber"
+	 * 				}
+	 * response		{
+	 * 					result:	roleOk/roleFailed/orderNotFound/itemFound/itemNotFound
+	 * 					response:true/false
+	 *				}
+	 */
 	@Override
 	public void itemCompleteRequest(String request) {
 		
 		Gson gson=new Gson();
 		itemOpRequest obj=gson.fromJson(request, itemOpRequest.class);
 		usersController.login(obj.user);
-		if(this.usersController.checkRole(
+		if(		this.usersController.checkRole(
 				obj.user
-				,UsersData.User.userRoles.Cameriere.name() ))
+				,UsersData.User.userRoles.Bar.name() )
+		||this.usersController.checkRole(
+				obj.user
+				,UsersData.User.userRoles.Cucina.name())
+		||
+				this.usersController.checkRole(
+						obj.user
+						,UsersData.User.userRoles.Forno.name())
+		)
 		{
+			
 			obj.result=this.controllerRestaurant.hasItem(obj.orderID,obj.itemLineNumber);
 			if(obj.result.equals(returnCodes.itemFound.name()))
 					obj.response=controllerRestaurant.itemComplete(obj.orderID,
@@ -397,16 +443,29 @@ public class SystemController  extends GeneralController implements controllerIf
 		}
 		else 
 			obj.result=results.roleFailed.name();
-		
 		this.brokerIface.publishResponse(gson.toJson(obj,messages.
 															itemOpRequest.class));
 	}
-	
+	/**
+	 * 
+	 * @param a realizzator asks for the list of orders of his specific area
+	 *  request:	{
+	 * 					user:"userID"
+	 * 					proxySource:""
+	 * 					request:"orderRequest"
+	 * 					areaVisualization: "areaToShow"
+	 * 					area:"nameOfTheArwa"
+	 * 				}
+	 * response		{
+	 * 					result:	roleOk/roleFailed
+	 * 					response:true/false
+	 *				}
+	 */
 	@Override
 	public void orderRequest(String request) {
 		Gson gson=new Gson();
 		orderRequest obj=gson.fromJson(request, orderRequest.class);
-		//checking the role of the request
+		
 		usersController.login(obj.user);
 		if(this.usersController.checkRole(
 				obj.user
@@ -416,8 +475,9 @@ public class SystemController  extends GeneralController implements controllerIf
 						,UsersData.User.userRoles.Cucina.name() )
 				|| this.usersController.checkRole(
 						obj.user
-						,UsersData.User.userRoles.Forno.name() )
+						,UsersData.User.userRoles.Forno.name() 
 				)
+			)
 		{
 			if(obj.areaVisualization)
 				obj.response=this.controllerRestaurant.getOrdersJSON(
