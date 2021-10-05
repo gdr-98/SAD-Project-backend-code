@@ -1,5 +1,6 @@
 package com.project.ProxyCameriere.ProxyCameriere.ProxyCameriere.JMS;
 
+import com.google.gson.Gson;
 import com.project.ProxyCameriere.ProxyCameriere.web.BaseMessage;
 import com.project.ProxyCameriere.ProxyCameriere.web.LoginResponse;
 import com.project.ProxyCameriere.ProxyCameriere.web.Post;
@@ -22,8 +23,10 @@ public class LoginReceiverJMS implements MessageListener {
     public void onMessage(@NotNull Message message) {
 
         LoginResponse msg_received = new LoginResponse();
+        Gson gson = new Gson();
         try {
-            msg_received = (LoginResponse) message.getBody(LoginResponse.class);
+            String helper = (String) message.getBody(Object.class);
+            msg_received=gson.fromJson(helper, LoginResponse.class);
         } catch (JMSException ex) {
             ex.printStackTrace();
         }

@@ -1,5 +1,6 @@
 package com.project.ProxyCameriere.ProxyCameriere.ProxyCameriere.JMS;
 
+import com.google.gson.Gson;
 import com.project.ProxyCameriere.ProxyCameriere.web.BaseMessage;
 import com.project.ProxyCameriere.ProxyCameriere.web.Post;
 import com.project.ProxyCameriere.ProxyCameriere.web.Webhook;
@@ -36,8 +37,11 @@ public class ReceiverJMS implements MessageListener {
         String url;
         BaseMessage msg_received = new BaseMessage() ;
         String msg_to_send = "";
+        Gson gson=new Gson();
         try {
-            msg_received = (BaseMessage) message.getBody(Object.class);
+            String helper= (String) message.getBody(String.class);
+            msg_received=gson.fromJson(helper,BaseMessage.class);
+            log.info("Returned is" +helper);
             msg_to_send = (String) message.getBody(Object.class);
         } catch (JMSException ex) {
             ex.printStackTrace();
