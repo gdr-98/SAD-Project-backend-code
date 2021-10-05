@@ -1,8 +1,8 @@
-package com.project.Proxy.ProxyRealizzatore.ProxyPizzaiolo;
+package com.project.ProxyRealizzatore.ProxyRealizzatore.ProxyChef;
 
-import com.project.Proxy.web.BaseMessage;
-import com.project.Proxy.web.Post;
-import com.project.Proxy.web.Webhook;
+import com.project.ProxyRealizzatore.ProxyRealizzatore.web.BaseMessage;
+import com.project.ProxyRealizzatore.ProxyRealizzatore.web.Post;
+import com.project.ProxyRealizzatore.ProxyRealizzatore.web.Webhook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jms.annotation.JmsListener;
@@ -17,7 +17,7 @@ public class ReceiverJMS implements MessageListener {
 
     private final Logger log = LoggerFactory.getLogger(ReceiverJMS.class);
 
-    @JmsListener(destination = "CodaPizzaioliBroker")
+    @JmsListener(destination = "CodaChefBroker")
     @Override
     public void onMessage (Message message) {
         /*
@@ -37,7 +37,7 @@ public class ReceiverJMS implements MessageListener {
 
         switch (msg_received.request) {
             case "itemCompleteRequest": case "itemWorkingRequest":
-                poster.createPost("http://"+ Webhook.Pizza_maker.get(msg_received.user)+"/notification",msg_to_send);
+                poster.createPost("http://"+ Webhook.Chef.get(msg_received.user)+"/notification",msg_to_send);
                 break;
 
             default:
