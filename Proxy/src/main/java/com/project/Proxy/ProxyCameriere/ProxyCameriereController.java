@@ -1,5 +1,6 @@
 package com.project.Proxy.ProxyCameriere;
 
+import com.project.Proxy.ProxyCameriere.JMS.LoginReceiverJMS;
 import com.project.Proxy.ProxyCameriere.JMS.ReceiverJMS;
 import com.project.Proxy.ProxyCameriere.JMS.SenderJMS;
 import org.slf4j.Logger;
@@ -25,6 +26,9 @@ public class ProxyCameriereController {
     @Autowired
     private SenderJMS sender;
 
+    @Autowired
+    private LoginReceiverJMS lreceiver;
+
     private final Logger log = LoggerFactory.getLogger(ProxyCameriereController.class);
 
     /*
@@ -40,7 +44,6 @@ public class ProxyCameriereController {
         return new ResponseEntity<>("URL registered", HttpStatus.OK);
     }
     */
-
 
     /*
      * Example format:
