@@ -40,7 +40,7 @@ public class ReceiverJMS implements MessageListener {
         BaseMessage msg_received = new BaseMessage();
         Gson gson = new Gson();
         try {
-            helper = (String) message.getBody(Object.class);
+            helper = (String) message.getBody(String.class);
             msg_received=gson.fromJson(helper,BaseMessage.class);
             log.info("Returned is" +helper);
             msg_to_send = (String) message.getBody(Object.class);
@@ -51,19 +51,15 @@ public class ReceiverJMS implements MessageListener {
         /*
         tableRequest,
         freeTableRequest,
+        userWaitingForOrdersRequest
          */
 
         switch (msg_received.request) {
-            case "tableRequest" :
-                poster.createPost("http://"+ Webhook.Acceptance.get(msg_received.user)+"/notification",msg_to_send);
+            //Semplici messaggi di conferma che vanno al singolo
+            case "tableRequest" : case "userWaitingForOrderRequest": case "freeTableRequest":
+                if(Webhook.Acceptance.containsKey(msg_received.user))
+                    poster.createPost("http://"+ Webhook.Acceptance.get(msg_received.user)+"/notification",msg_to_send);
                 break;
-
-            case "freeTableRequest":
-                for (Map.Entry<String, String> me : Webhook.Acceptance.entrySet()) {
-                    poster.createPost("http://"+ me.getValue()+"/notification",msg_to_send);
-                }
-                break;
-
             default:
                 log.info("Message does not match with any of the expected ones");
                 break;

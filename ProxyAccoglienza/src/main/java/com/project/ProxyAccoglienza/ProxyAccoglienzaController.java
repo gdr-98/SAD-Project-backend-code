@@ -31,10 +31,10 @@ public class ProxyAccoglienzaController {
 
     private final Logger log = LoggerFactory.getLogger(com.project.ProxyAccoglienza.ProxyAccoglienzaController.class);
 
-    @PostMapping(value = "/TableManagement")
+    @PostMapping(value = "/acceptanceSend")
     public ResponseEntity<String> sendJMS (@RequestBody String msg) {
         log.info("ProxyAccoglienza message received");
         sender.sendMessage(msg);
-        return new ResponseEntity<>("[Table state update] - Request received from Proxy", HttpStatus.OK);
+        return new ResponseEntity<>("Event sent", HttpStatus.OK);
     }
 }

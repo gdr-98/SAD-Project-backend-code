@@ -1,7 +1,5 @@
 package com.project.ProxyAccoglienza.JMS;
 
-import com.google.gson.Gson;
-import com.project.ProxyAccoglienza.web.BaseMessage;
 import com.project.ProxyAccoglienza.web.LoginResponse;
 import com.project.ProxyAccoglienza.web.Post;
 import com.project.ProxyAccoglienza.web.Webhook;
@@ -23,10 +21,8 @@ public class LoginReceiverJMS implements MessageListener {
     public void onMessage(@NotNull Message message) {
 
         LoginResponse msg_received = new LoginResponse();
-        Gson gson = new Gson();
         try {
-            String helper = (String) message.getBody(Object.class);
-            msg_received=gson.fromJson(helper, LoginResponse.class);
+            msg_received = (LoginResponse) message.getBody(LoginResponse.class);
         } catch (JMSException ex) {
             ex.printStackTrace();
         }
