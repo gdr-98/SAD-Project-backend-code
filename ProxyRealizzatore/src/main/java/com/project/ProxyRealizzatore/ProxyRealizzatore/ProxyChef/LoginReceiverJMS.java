@@ -1,8 +1,8 @@
-package com.project.Proxy.ProxyRealizzatore.ProxyChef;
+package com.project.ProxyRealizzatore.ProxyRealizzatore.ProxyChef;
 
-import com.project.Proxy.web.LoginResponse;
-import com.project.Proxy.web.Post;
-import com.project.Proxy.web.Webhook;
+import com.project.ProxyRealizzatore.ProxyRealizzatore.web.Post;
+import com.project.ProxyRealizzatore.ProxyRealizzatore.web.Webhook;
+import com.project.ProxyRealizzatore.ProxyRealizzatore.web.LoginResponse;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.jms.annotation.JmsListener;
 

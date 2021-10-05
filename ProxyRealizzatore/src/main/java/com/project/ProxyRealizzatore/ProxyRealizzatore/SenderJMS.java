@@ -1,4 +1,4 @@
-package com.project.Proxy.ProxyRealizzatore;
+package com.project.ProxyRealizzatore.ProxyRealizzatore;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

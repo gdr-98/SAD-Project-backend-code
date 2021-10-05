@@ -1,7 +1,7 @@
-package com.project.Proxy.ProxyRealizzatore;
+package com.project.ProxyRealizzatore.ProxyRealizzatore;
 
-import com.project.Proxy.ProxyRealizzatore.ProxyChef.LoginReceiverJMS;
-import com.project.Proxy.ProxyRealizzatore.ProxyChef.ReceiverJMS;
+import com.project.ProxyRealizzatore.ProxyRealizzatore.ProxyChef.LoginReceiverJMS;
+import com.project.ProxyRealizzatore.ProxyRealizzatore.ProxyChef.ReceiverJMS;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,12 +15,12 @@ public class ProxyRealizzatoreController {
     @Autowired
     ReceiverJMS receiverchef;
     @Autowired
-    com.project.Proxy.ProxyRealizzatore.ProxyPizzaiolo.ReceiverJMS receiverpizzaiolo;
+    com.project.ProxyRealizzatore.ProxyRealizzatore.ProxyPizzaiolo.ReceiverJMS receiverpizzaiolo;
 
     @Autowired
     LoginReceiverJMS lreceiverchef;
     @Autowired
-    com.project.Proxy.ProxyRealizzatore.ProxyPizzaiolo.LoginReceiverJMS lreceiverpizzaiolo;
+    com.project.ProxyRealizzatore.ProxyRealizzatore.ProxyPizzaiolo.LoginReceiverJMS lreceiverpizzaiolo;
 
     @Autowired
     SenderJMS sender;
