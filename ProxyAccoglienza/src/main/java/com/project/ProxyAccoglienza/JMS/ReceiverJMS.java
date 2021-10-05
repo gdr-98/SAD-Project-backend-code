@@ -40,7 +40,7 @@ public class ReceiverJMS implements MessageListener {
         BaseMessage msg_received = new BaseMessage();
         Gson gson = new Gson();
         try {
-            helper = (String) message.getBody(String.class);
+            helper = (String) message.getBody(Object.class);
             msg_received=gson.fromJson(helper,BaseMessage.class);
             log.info("Returned is" +helper);
             msg_to_send = (String) message.getBody(Object.class);

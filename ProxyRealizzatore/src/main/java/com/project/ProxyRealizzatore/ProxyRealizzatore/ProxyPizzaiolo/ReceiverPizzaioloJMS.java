@@ -1,23 +1,26 @@
-package com.project.ProxyRealizzatore.ProxyRealizzatore.ProxyChef;
+package com.project.ProxyRealizzatore.ProxyRealizzatore.ProxyPizzaiolo;
 
+import com.google.gson.Gson;
 import com.project.ProxyRealizzatore.ProxyRealizzatore.web.BaseMessage;
 import com.project.ProxyRealizzatore.ProxyRealizzatore.web.Post;
 import com.project.ProxyRealizzatore.ProxyRealizzatore.web.Webhook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jms.annotation.JmsListener;
+import org.springframework.stereotype.Service;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 
-public class ReceiverJMS implements MessageListener {
+@Service
+public class ReceiverPizzaioloJMS implements MessageListener {
 
     private final Post poster = new Post();
 
-    private final Logger log = LoggerFactory.getLogger(ReceiverJMS.class);
+    private final Logger log = LoggerFactory.getLogger(ReceiverPizzaioloJMS.class);
 
-    @JmsListener(destination = "CodaChefBroker")
+    @JmsListener(destination = "CodaPizzaioliBroker")
     @Override
     public void onMessage (Message message) {
         /*
@@ -25,8 +28,12 @@ public class ReceiverJMS implements MessageListener {
          */
         String msg_to_send = "";
         BaseMessage msg_received = new BaseMessage();
+        Gson gson=new Gson();
         try {
-            msg_received = (BaseMessage) message.getBody(Object.class);
+            String helper = (String) message.getBody(Object.class);
+            msg_received=gson.fromJson(helper,BaseMessage.class);
+            log.info("Returned is" +helper);
+            msg_to_send = (String) message.getBody(Object.class);
         } catch (JMSException ex) {
             ex.printStackTrace();
         }
@@ -37,7 +44,7 @@ public class ReceiverJMS implements MessageListener {
 
         switch (msg_received.request) {
             case "itemCompleteRequest": case "itemWorkingRequest":
-                poster.createPost("http://"+ Webhook.Chef.get(msg_received.user)+"/notification",msg_to_send);
+                poster.createPost("http://"+ Webhook.Pizza_maker.get(msg_received.user)+"/notification",msg_to_send);
                 break;
 
             default:
