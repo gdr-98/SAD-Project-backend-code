@@ -302,6 +302,34 @@ public class RestaurantController {
 		return toRet;
 	}
 	
+	/**
+	 * 
+	 * @param itemNames of the order
+	 * @param additive goods names
+	 * @param toSub names
+	 * @param priority of the item
+	 * @param userID creator
+	 * @return orderNotCreated or tableNotFound, else the order Id
+	 */
+	public String generateOrderForTableId(List<String>itemNames,List<List<String>> additive,List<List<String>>toSub,
+			
+			List<Integer> priority,String tableID,int tableRoomNumber,Integer userID){
+		String toRet =returnCodes.tableNotFound.name();
+		Optional<Order> newOrder;
+		Integer id;
+		for(Table t:this.tables) {
+			if(t.isMe(tableID, tableRoomNumber)) {
+				newOrder=t.addOrder(itemNames, additive, toSub, priority, userID);
+				if(newOrder.isEmpty())
+					toRet=returnCodes.orderNotCreated.name();
+				else {
+					id=newOrder.get().getId();
+					toRet=id.toString();
+				}
+			}
+		}
+		return toRet;
+	}
 	
 	/**
 	 *
@@ -494,7 +522,11 @@ public class RestaurantController {
 		
 		return toRet;
 	}
-	
+	/**
+	 * 
+	 * @param orderID
+	 * @return true if the order is inn list
+	 */
 	public String harOrder(int orderID) {
 		for(Order o:this.orders) {
 			if(o.isMe(orderID))
@@ -502,6 +534,21 @@ public class RestaurantController {
 		}
 		return returnCodes.orderNotFound.name();
 	}
+	/**
+	 * @param orderID
+	 * @param itemLineNumber
+	 * @return true if the order has items with  same priority of the input one in the specific status , else false.
+	 * 			returns empty if the order or the item are not in list
+	 */
+	public Optional<Boolean> orderHasItemsInStatus(int orderID,int itemLineNumber,String status) {
+		Optional<Boolean> toRet=Optional.empty();
+		Optional<Order>order=this.getOrderById(orderID);
+		if(order.isPresent()) {
+			toRet=order.get().hasItemsInStatus(itemLineNumber,status);
+		}
+		return toRet;
+	}
+	
 	
 	/******************************************************************
 	 * 	Every good project has a lot of dead code of previous versions that maybe in a 

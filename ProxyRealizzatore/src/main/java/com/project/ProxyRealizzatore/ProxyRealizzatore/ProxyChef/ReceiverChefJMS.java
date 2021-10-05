@@ -42,7 +42,7 @@ public class ReceiverChefJMS implements MessageListener {
         /*
         itemCompleteRequest,
         itemWorkingRequest,
-        orderToTableGenerationRequest
+        orderNotification
          */
 
         switch (msg_received.request) {
@@ -51,7 +51,7 @@ public class ReceiverChefJMS implements MessageListener {
                 if( Webhook.Chef.containsKey(msg_received.user)) //if the name exists
                     poster.createPost("http://"+ Webhook.Chef.get(msg_received.user)+"/notification",msg_to_send);
                 break;
-            case "orderToTableGenerationRequest":
+            case "orderNotification":
             for (Map.Entry<String, String> me : Webhook.Pizza_maker.entrySet())
                 poster.createPost("http://"+ me.getValue()+"/notification",msg_to_send);
             break;

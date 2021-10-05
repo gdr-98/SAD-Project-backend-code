@@ -79,6 +79,5 @@ public class ReceiverJMS implements MessageListener {
                 break;
         }
 
-        log.info("Event received: ");
     }
 }

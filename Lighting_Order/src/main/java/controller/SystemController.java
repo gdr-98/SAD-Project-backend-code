@@ -1,17 +1,24 @@
 package controller;
 
 import MenuAndWareHouseArea.MenuAndGoodsController;
+import MenuAndWareHouseArea.OrderedItemState;
+import RestaurantArea.Order;
+import RestaurantArea.Order.OrderStates;
 import RestaurantArea.RestaurantController;
 import RestaurantArea.RestaurantController.returnCodes;
 import UsersData.UsersController;
 import messages.cancelOrderRequest;
 import messages.itemOpRequest;
 import messages.menuRequest;
+import messages.orderNotification;
 import messages.orderRequest;
 import messages.tableOperation;
 import messages.tableRequest;
 import request_generator.controllerIface;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 
@@ -223,6 +230,7 @@ public class SystemController  extends GeneralController implements controllerIf
 	
 	/**
 	 * @info a waiter generates an order
+	 * @additiveInfo this function triggers more events, one for the operation confirmation and the others for sending the order
 	 * @param Request, alter a table state and publish the response to the broker
 	 * request:		{
 	 * 					user:"userID"
@@ -239,14 +247,11 @@ public class SystemController  extends GeneralController implements controllerIf
 	 * 							priority:	[priorityForItem1....]
 	 * 					}
 	 * 				}
-	 * 	response:	{
+	 * 	responses:	{
 	 * 					request
-	 * 					result: "roleFailed/roleOk/operationReturnCode"
-	 * 					response: empty
-	 * 					kitchenOrder:"part of order for the kitchenn"
-	 * 					barOrder:"part of order for the bar"
-	 * 					bakeryOrder:"Part of order for the bakery"
+	 * 					result: "roleFailed/roleOk"
 	 * 				}
+	 *
 	 */
 	@Override
 	public void orderToTableGenerationRequest(String request) {
@@ -254,32 +259,51 @@ public class SystemController  extends GeneralController implements controllerIf
 		messages.orderToTableGenerationRequest obj=gson.fromJson(request,
 				messages.orderToTableGenerationRequest.class);
 		usersController.login(obj.user);
+		List<orderNotification> makerNotifications=new ArrayList<>();
 		if(this.usersController.checkRole(
 				obj.user
 				,UsersData.User.userRoles.Cameriere.name() ))
 		{
 			obj.result=results.roleOk.name();
-			obj.response=
+			/*obj.response=
 					this.controllerRestaurant.generateOrderForTable
 					(		obj.orderParams.itemNames, 
 							obj.orderParams.addGoods,
 							obj.orderParams.subGoods, 
 							obj.orderParams.priority,
 							obj.tableId, obj.tableRoomNumber, Integer.valueOf(obj.user))
-					;
+					;*/
+			/*
 			obj.kitchenOrder=this.controllerRestaurant.getLastOrder().get().
 					getJSONRepresentation(Optional.of("Cucina"));
 			obj.bakeryOrder=this.controllerRestaurant.getLastOrder().get().
 					getJSONRepresentation(Optional.of("Forno"));
 			obj.barOrder=this.controllerRestaurant.getLastOrder().get().
-					getJSONRepresentation(Optional.of("Bar"));
+					getJSONRepresentation(Optional.of("Bar"));*/
 			
+			obj.response=	this.controllerRestaurant.generateOrderForTableId
+					(		obj.orderParams.itemNames, 
+							obj.orderParams.addGoods,
+							obj.orderParams.subGoods, 
+							obj.orderParams.priority,
+							obj.tableId, obj.tableRoomNumber, Integer.valueOf(obj.user))
+					;
+			if((!obj.response.equals(returnCodes.tableNotFound.name()))&&
+					(!obj.response.equals(returnCodes.orderNotCreated.name()))	)  
+				//if the order is created then generate events for makers
+					makerNotifications=this.generateOrderNotifications(Integer.valueOf(obj.response));
+					
 		}
 		else {
 			obj.result=results.roleFailed.name();
 		}
+		
+		//Publish the operation report
 		this.brokerIface.publishResponse(gson.toJson(obj,messages.
 															orderToTableGenerationRequest.class));
+		for(orderNotification not:makerNotifications)
+			this.brokerIface.publishResponse(gson.toJson(not,messages.
+													orderNotification.class));
 	}
 	
 	/**
@@ -421,6 +445,7 @@ public class SystemController  extends GeneralController implements controllerIf
 		Gson gson=new Gson();
 		itemOpRequest obj=gson.fromJson(request, itemOpRequest.class);
 		usersController.login(obj.user);
+		List<orderNotification>makerNotifications=new ArrayList<>();
 		if(		this.usersController.checkRole(
 				obj.user
 				,UsersData.User.userRoles.Bar.name() )
@@ -435,15 +460,29 @@ public class SystemController  extends GeneralController implements controllerIf
 		{
 			
 			obj.result=this.controllerRestaurant.hasItem(obj.orderID,obj.itemLineNumber);
-			if(obj.result.equals(returnCodes.itemFound.name()))
+			if(obj.result.equals(returnCodes.itemFound.name())) {
 					obj.response=controllerRestaurant.itemComplete(obj.orderID,
-														obj.itemLineNumber).get().toString();
-																	
+														obj.itemLineNumber).get().toString();	
+					//now generate users notifications 
+					 //sure to find the order
+					if((!controllerRestaurant.orderHasItemsInStatus(
+									obj.orderID,obj.itemLineNumber,
+									OrderedItemState.States.WaitingForWorking.name())
+									.get())&&
+						(!controllerRestaurant.orderHasItemsInStatus(
+									obj.orderID,obj.itemLineNumber,
+									OrderedItemState.States.Working.name())
+									.get()))
+						makerNotifications=generateOrderNotifications(obj.orderID);
+			}
 		}
 		else 
 			obj.result=results.roleFailed.name();
 		this.brokerIface.publishResponse(gson.toJson(obj,messages.
 															itemOpRequest.class));
+		for(orderNotification not:makerNotifications)
+			this.brokerIface.publishResponse(gson.toJson(not,messages.
+													orderNotification.class));
 	}
 	/**
 	 * 
@@ -498,5 +537,40 @@ public class SystemController  extends GeneralController implements controllerIf
 	public void loginRequest(String request) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	
+	/**
+	 * @info generate notification for makers in case a new order is created or priority of the order changed
+	 * @param orderID
+	 * @return list of notifications
+	 */
+	private List<orderNotification> generateOrderNotifications(int orderID){
+		
+		//["Forno","Cucina","Bar"]
+		List<String> areas=new ArrayList<>(
+				Arrays.asList("Forno","Cucina","Bar")	
+			);
+		String helper;
+		
+		//find the order
+		List<orderNotification> notifications=new ArrayList<>();
+		Optional<Order>order=this.controllerRestaurant.getOrderById(orderID);
+		if(order.isPresent()) { //if the order exists
+			for(String area:areas) { //for each area
+				//get orders with highest priority
+				helper=order.get().getJSONRepresentationAsCommande(area);
+				if(!helper.isBlank()) { //if there are items in that area
+					orderNotification helper2=new orderNotification();
+					helper2.request="orderNotification";
+					helper2.area=area;
+					helper2.order=helper;
+					notifications.add(
+							helper2
+							);
+				}
+			}						
+		}
+		return notifications;
 	}
 }

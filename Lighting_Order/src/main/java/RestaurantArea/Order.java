@@ -25,6 +25,11 @@ import java.util.Optional;
 public class Order {
 
 	/**
+	 * @info: flag used to show only item with max priority
+	 */
+	public final static  Integer maxPrioFlag=-1;
+	
+	/**
 	 * 
 	 * @info List of states for the order
 	 *
@@ -215,6 +220,7 @@ public class Order {
 	public String getStateString() {return getState().name();}
 	
 	/**
+	 * old
 	 * @area	returns ordered items with just a specific area
 	 * @return the json representation of the object
 	 */
@@ -522,25 +528,146 @@ public class Order {
 	}
 	
 	/**
-	 * 
-	 * @return the ordered items with greater priority & not completed
+	 * @area	returns ordered items with just a specific area
+	 * @status	with this flag it will return only the items inn a specific status, check
+	 * 			ordered item states for more info.
+	 * @priority	priority of the item, if -1 means to search for max prio 
+	 * @status
+	 * @return the json representation of the object
 	 */
-	/*
-	private List<OrderedItem> remainingItems(){
-		List<OrderedItem> toRet=new ArrayList<>();
-		//Let's find max
-		int min=Integer.MAX_VALUE;
-		int itemPriority;
-		for(OrderedItem item :this.orderedItems) {
-			itemPriority=item.getPriority();
-			if(itemPriority<min && !item.getState().equals("Completed"))
-				min=item.getPriority();
+	public String getJSONRepresentationAsCommande(String area) {
+		
+		if(area==null)
+			return "";
+		//all items in waiting for working
+		List <OrderedItem> itemsToAdd=itemsInState(this.orderedItems,OrderedItemState.States.WaitingForWorking.name());
+		JsonArray helper=new JsonArray();
+		JsonObject objectHelper;
+		//return the highest priority of the item inn waiting for order
+		Integer prioToAdd=findItemsHighestPriority(itemsToAdd);
+		//Now isolate the items with this specific priority
+		itemsToAdd=itemsWithPriority(itemsToAdd,prioToAdd);
+		//now select the items of the specific area
+		itemsToAdd=itemsInArea(itemsToAdd,area);
+		if(itemsToAdd.isEmpty()) //if no items in the area with an area request
+			return  "";
+		
+		for(OrderedItem item:itemsToAdd) { //if the item is present the add his json representation
+			objectHelper=JsonParser.parseString(item.getJSONRepresentation()).getAsJsonObject();
+			helper.add(objectHelper.toString());
 		}
 		
-		for(OrderedItem item :this.orderedItems) {
-			if(item.getPriority()==min && !item.getState().equals("Completed"))
+		Gson gson = new GsonBuilder()
+				  .excludeFieldsWithoutExposeAnnotation()
+				  .create();
+		JsonObject to_ret=gson.toJsonTree(this).getAsJsonObject();
+		if(this.associatedTable.isEmpty()) {
+			to_ret.addProperty("tableRoomNumber", "-1");
+			to_ret.addProperty("tableID","");
+		}
+		else {
+			to_ret.getAsJsonObject().addProperty("tableRoomNumber", this.associatedTable.get().getRoomNumber());
+			to_ret.getAsJsonObject().addProperty("tableID",this.associatedTable.get().getId());
+		}
+		
+		
+		to_ret.add("orderedItems", helper);
+		
+		return gson.toJson(to_ret);
+	}
+	/**
+	 * @info check if there are items in an input status having the same priority of the itemLineNumber
+	 * @param itemLineNumber
+	 * @param status
+	 * @return
+	 */
+	public Optional<Boolean>hasItemsInStatus(int itemLineNumber,String status) {
+		
+		Optional<Boolean> toRet=Optional.empty();
+		List<OrderedItem> helper;
+		int priority=Integer.MAX_VALUE;
+		//retrieve the priority of the item
+		for(OrderedItem item:this.orderedItems) {
+			if(item.isMe(itemLineNumber)) {
+				priority=item.getPriority();
+			}
+		}
+		if(priority==Integer.MAX_VALUE) //No item..
+			return toRet;
+		//Get all items with this priority
+		/*helper=itemsWithPriority(this.orderedItems,priority);
+		if(helper.size()!=0) // if there is at least one
+			return Optional.of(true);*/
+		toRet=Optional.of(false);
+		//check priority and status
+		for(OrderedItem item:this.orderedItems) {
+			if(item.getState().equals(status)&&item.getPriority()==priority) {
+				return Optional.of(true); //if at least one exists return true
+			}
+		}
+		return toRet;
+	}
+	
+	
+	/**
+	 * @info  higher is the priority, then smaller is the number value (1 max priority ) 
+	 * @param list of ordered items
+	 * @return
+	 */
+	
+	private static Integer findItemsHighestPriority(List<OrderedItem> items) {
+		Integer highestPriority=Integer.MAX_VALUE;
+		Integer helper;
+		for(OrderedItem item:items) {
+			helper=item.getPriority();
+			if(helper<highestPriority) //smallest number then highest priority
+				highestPriority=helper;
+		}
+		return highestPriority;
+	}
+	
+	/**
+	 * 
+	 * @param items
+	 * @return the ordered items with max priority
+	 */
+
+	private static List<OrderedItem> itemsWithPriority(List<OrderedItem>items,Integer priority){
+		List<OrderedItem>toRet=new ArrayList<>();
+		for(OrderedItem item:items) {
+			if(priority.equals(item.getPriority()))
+				toRet.add(item);
+	
+		}
+		return toRet;
+	}
+	
+	/**
+	 * 
+	 * @param items
+	 * @return the ordered items in a specific state
+	 */
+	private static List<OrderedItem> itemsInState(List<OrderedItem>items,String state){
+		List<OrderedItem>toRet=new ArrayList<>();	
+		for(OrderedItem item:items) {
+			if(item.getState().equals(state))
 				toRet.add(item);
 		}
 		return toRet;
-	}*/
+	}
+	
+	/**
+	 * 
+	 * @param items
+	 * @return the ordered items in a specific area
+	 */
+	private static List<OrderedItem> itemsInArea(List<OrderedItem>items,String area){
+		List<OrderedItem>toRet=new ArrayList<>();	
+		for(OrderedItem item:items) {
+			if(item.getItem().getArea().equals(area))
+				toRet.add(item);
+		}
+		return toRet;
+	}
+	
 }

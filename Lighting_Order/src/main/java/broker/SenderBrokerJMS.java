@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 
+import com.google.gson.Gson;
+import messages.orderNotification;
 @Service("SenderBrokerJMS")
 public class SenderBrokerJMS {
 
@@ -41,11 +43,11 @@ public class SenderBrokerJMS {
          * table requests, cancelOrder e canncelOrderedItems...
          * Solo messaggi di conferma operazione o di inoltro di dati
          */
-        public void sendWaitersConfirmation(String message) {
+        public void sendWaitersInfo(String message) {
         	this.send(waitersQueueBroker,message);
         }
         
-        public void sendOrderGenerationConfirmation(String message) {
+        public void sendOrderGenerationInfo(String message) {
         	this.send(waitersQueueBroker,message);
         }
         public void sendOrderToBakery(String message) {
@@ -61,7 +63,7 @@ public class SenderBrokerJMS {
         /**
          * Eventi di eseguita operazionne/conferma da inviare agli addetti all'accoglienza
          */
-        public void sendAcceptanceConfirmation(String message) {
+        public void sendAcceptanceInfo(String message) {
         	this.send(acceptanceQueueBroker, message);
         }
           
@@ -75,9 +77,29 @@ public class SenderBrokerJMS {
         /**
          * Invia un messaggio di avvenuta operazione per un realizzatore
          */
-    	public void sendRealizzatorConfirmation(String message) {
+    	public void sendMakerInfo(String message) {
     		this.send(bakeryQueueBroker,message);
     		this.send(barQueueBroker,message);
     		this.send(kitchenQueueBroker,message);
+    	}
+    	
+    	/**
+    	 *  Notificare ai maker che devono effettuare un ordine
+    	 */
+    	public void sendMakerNotification(String message) {
+    		Gson gson=new Gson();		
+			orderNotification not=gson.fromJson(message, orderNotification.class);
+			switch (not.area) {
+				case "Cucina":
+					this.sendOrderToKitchen(message);
+					break;
+				case "Bar":
+					this.sendOrderToBar(message);
+					break;
+				case "Forno":
+					this.sendOrderToBakery(message);
+					break;
+			}
+    		
     	}
 }

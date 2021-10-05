@@ -20,36 +20,33 @@ public class DispatcherBroker implements BrokerInterface{
 		Gson gson=new Gson();
 		baseMessage helper=gson.fromJson(response,baseMessage.class);
 		switch (helper.request){
-		//1 2 3
-		case "menuRequest" :case "cancelOrderRequest" :case "cancelOrderedItemRequest":
-			sender.sendWaitersConfirmation(response);
+		//1 2 3 4
+		case "menuRequest" :case "cancelOrderRequest" :case "cancelOrderedItemRequest": case "orderToTableGenerationRequest": 
+			sender.sendWaitersInfo(response);
 			break;
-		//4 
-		case "orderToTableGenerationRequest": 
-			sender.sendOrderGenerationConfirmation(response);
-			sender.sendOrderToKitchen(response);
-			sender.sendOrderToBakery(response);
-			sender.sendOrderToBar(response);
-			break;
-		//5
-		case "tableRequest":
-			//Lo possono richiedere enntrambi, saranno poi i proxy a distinguere in base all'userID
-			sender.sendAcceptanceConfirmation(response);
-			sender.sendWaitersConfirmation(response);
+		//5 
+		case "orderNotification":
+			sender.sendMakerNotification(response);
 			break;
 		//6
-		case "freeTableRequest":
-			sender.sendAcceptanceConfirmation(response);
+		case "tableRequest":
+			//Lo possono richiedere enntrambi, saranno poi i proxy a distinguere in base all'userID
+			sender.sendAcceptanceInfo(response);
+			sender.sendWaitersInfo(response);
 			break;
 		//7
+		case "freeTableRequest":
+			sender.sendAcceptanceInfo(response);
+			break;
+		//8
 		case "userWaitingForOrderRequest":
-			sender.sendAcceptanceConfirmation(response);
+			sender.sendAcceptanceInfo(response);
 			//I camerieri devono essere informati che un utente voglia ordinare
 			sender.notifyWaitersForTable(response);
 			break;
-		//8	9 10 
+		//9	10 11 
 		case "itemCompleteRequest":case "itemWorkingRequest":case "orderRequest":
-			sender.sendRealizzatorConfirmation(response);
+			sender.sendMakerInfo(response);
 			break;
 		
 		default: //Invalid request
