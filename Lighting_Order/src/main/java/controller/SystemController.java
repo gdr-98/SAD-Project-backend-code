@@ -278,7 +278,6 @@ public class SystemController  extends GeneralController implements controllerIf
 		else {
 			obj.result=results.roleFailed.name();
 		}
-		System.out.println("inhere");
 		this.brokerIface.publishResponse(gson.toJson(obj,messages.
 															orderToTableGenerationRequest.class));
 	}
