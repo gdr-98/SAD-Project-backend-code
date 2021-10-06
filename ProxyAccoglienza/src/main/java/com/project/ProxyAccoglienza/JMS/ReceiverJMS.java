@@ -54,7 +54,7 @@ public class ReceiverJMS implements MessageListener {
         userWaitingForOrdersRequest
          */
 
-        switch (msg_received.request) {
+        switch (msg_received.messageName) {
             //Semplici messaggi di conferma che vanno al singolo
             case "tableRequest" : case "userWaitingForOrderRequest": case "freeTableRequest":
                 if(Webhook.Acceptance.containsKey(msg_received.user))

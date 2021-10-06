@@ -45,7 +45,7 @@ public class ReceiverChefJMS implements MessageListener {
         orderNotification
          */
 
-        switch (msg_received.request) {
+        switch (msg_received.messageName) {
 
             case "itemCompleteRequest": case "itemWorkingRequest": case "orderRequest":
                 if( Webhook.Chef.containsKey(msg_received.user)) //if the name exists

@@ -70,7 +70,7 @@ public class SenderBrokerJMS {
         /**
          * Un cliente si è seduto ad un tavolo, questa è la notifica che arriva ad un cameriere
          */
-        public void notifyWaitersForTable(String message) {
+        public void sendWaitersNotification(String message) {
         	this.send(waitersQueueBroker, message);
         }
         

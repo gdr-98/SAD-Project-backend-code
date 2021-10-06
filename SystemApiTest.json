@@ -12,7 +12,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"user\":\"1\",\"proxySource\":\"\",\"request\":\"menuRequest\",\"areaVisualization\":false,\"areaMenu\":\"\"}",
+					"raw": "{\"user\":\"1\",\"proxySource\":\"\",\"messageName\":\"menuRequest\",\"areaVisualization\":false,\"areaMenu\":\"\"}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -30,7 +30,7 @@
 					]
 				}
 			},
-			"response": []/Users/antonioemmanuele/Desktop/SystemTests.json
+			"response": []
 		},
 		{
 			"name": "localhost:8081/send",
@@ -39,7 +39,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"user\":\"1\",\"proxySource\":\"\",\"request\":\"menuRequest\",\"areaVisualization\":true,\"areaMenu\":\"Forno\"}"
+					"raw": "{\"user\":\"1\",\"proxySource\":\"\",\"messageName\":\"menuRequest\",\"areaVisualization\":true,\"areaMenu\":\"Forno\"}"
 				},
 				"url": {
 					"raw": "localhost:8082/waitersSend",
@@ -61,7 +61,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"user\":\"1\",\"request\":\"orderToTableGenerationRequest\",\"tableId\":\"3\",\"tableRoomNumber\":1,\"orderParams\":{\"itemNames\":[\"Margherita\"],\"addGoods\":[[]],\"subGoods\":[[]],\"priority\":[1]}}"
+					"raw": "{\"user\":\"1\",\"messageName\":\"orderToTableGenerationRequest\",\"tableId\":\"3\",\"tableRoomNumber\":1,\"orderParams\":{\"itemNames\":[\"Margherita\"],\"addGoods\":[[]],\"subGoods\":[[]],\"priority\":[1]}}"
 				},
 				"url": {
 					"raw": "localhost:8082/waitersSend",
@@ -83,7 +83,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"user\":\"1\",\"request\":\"orderToTableGenerationRequest\",\"tableId\":\"3\",\"tableRoomNumber\":1,\"orderParams\":{\"itemNames\":[\"Margherita\",\"Patate Fritte\"],\"addGoods\":[[],[]],\"subGoods\":[[],[]],\"priority\":[1,2]}}"
+					"raw": "{\"user\":\"1\",\"messageName\":\"orderToTableGenerationRequest\",\"tableId\":\"3\",\"tableRoomNumber\":1,\"orderParams\":{\"itemNames\":[\"Margherita\",\"Patate Fritte\"],\"addGoods\":[[],[]],\"subGoods\":[[],[]],\"priority\":[1,2]}}"
 				},
 				"url": {
 					"raw": "localhost:8082/waitersSend",
@@ -105,7 +105,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"user\":\"1\",\"request\":\"orderToTableGenerationRequest\",\"tableId\":\"3\",\"tableRoomNumber\":1,\"orderParams\":{\"itemNames\":[\"Margherita\",\"Patate Fritte\"],\"addGoods\":[[],[]],\"subGoods\":[[],[]],\"priority\":[2,1]}}"
+					"raw": "{\"user\":\"1\",\"messageName\":\"orderToTableGenerationRequest\",\"tableId\":\"3\",\"tableRoomNumber\":1,\"orderParams\":{\"itemNames\":[\"Margherita\",\"Patate Fritte\"],\"addGoods\":[[],[]],\"subGoods\":[[],[]],\"priority\":[2,1]}}"
 				},
 				"url": {
 					"raw": "localhost:8082/waitersSend",
@@ -127,7 +127,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"user\":\"1\",\"request\":\"orderToTableGenerationRequest\",\"tableId\":\"3\",\"tableRoomNumber\":1,\"orderParams\":{\"itemNames\":[\"Margherita\",\"Patate Fritte\",\"Napoletana\"],\"addGoods\":[[],[],[]],\"subGoods\":[[],[],[]],\"priority\":[1,2,2]}}"
+					"raw": "{\"user\":\"1\",\"messageName\":\"orderToTableGenerationRequest\",\"tableId\":\"3\",\"tableRoomNumber\":1,\"orderParams\":{\"itemNames\":[\"Margherita\",\"Patate Fritte\",\"Napoletana\"],\"addGoods\":[[],[],[]],\"subGoods\":[[],[],[]],\"priority\":[1,2,2]}}"
 				},
 				"url": {
 					"raw": "localhost:8082/waitersSend",
@@ -143,13 +143,13 @@
 			"response": []
 		},
 		{
-			"name": "RichiestaForno",
+			"name": "RichiestaFornoMenu",
 			"request": {
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"user\":\"1\",\"request\":\"menuRequest\",\"areaVisualization\":true,\"areaMenu\":\"Forno\"}"
+					"raw": "{\"user\":\"1\",\"messageName\":\"menuRequest\",\"areaVisualization\":true,\"areaMenu\":\"Forno\"}"
 				},
 				"url": {
 					"raw": "localhost:8082/waitersSend",
@@ -171,7 +171,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"user\":1,\"request\":\"tableRequest\",\"forRoom\":false,\"roomNumber\":0,\"showItemsInArea\":false,\"orderArea\":\"\"}"
+					"raw": "{\"user\":1,\"messageName\":\"tableRequest\",\"forRoom\":false,\"roomNumber\":0,\"showItemsInArea\":false,\"orderArea\":\"\"}"
 				},
 				"url": {
 					"raw": "localhost:8082/waitersSend",
@@ -193,7 +193,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"user\":\"1\",\"request\":\"freeTableRequest\",\"tableID\":\"3\",\"tableRoomNumber\":1}"
+					"raw": "{\"user\":\"1\",\"messageName\":\"freeTableRequest\",\"tableID\":\"3\",\"tableRoomNumber\":1}"
 				},
 				"url": {
 					"raw": "http://localhost:8081/acceptanceSend",
@@ -216,7 +216,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"user\":\"2\",\"proxySource\":\"\",\"request\":\"orderRequest\",\"areaVisualization\":true,\"area\":\"Forno\"}"
+					"raw": "{\"user\":\"2\",\"proxySource\":\"\",\"messageName\":\"orderRequest\",\"areaVisualization\":true,\"area\":\"Forno\"}"
 				},
 				"url": {
 					"raw": "localhost:8083/makerSend",
@@ -238,7 +238,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"user\":\"2\",\"request\":\"itemCompleteRequest\",\"orderID\":6,\"itemLineNumber\":2}"
+					"raw": "{\"user\":\"2\",\"messageName\":\"itemCompleteRequest\",\"orderID\":6,\"itemLineNumber\":2}"
 				},
 				"url": {
 					"raw": "localhost:8083/makerSend",
@@ -260,7 +260,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"user\":\"2\",\"request\":\"itemCompleteRequest\",\"orderID\":7,\"itemLineNumber\":1}"
+					"raw": "{\"user\":\"2\",\"messageName\":\"itemCompleteRequest\",\"orderID\":3,\"itemLineNumber\":1}"
 				},
 				"url": {
 					"raw": "localhost:8083/makerSend",
@@ -282,7 +282,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"user\":\"2\",\"request\":\"itemWorkingRequest\",\"orderID\":2,\"itemLineNumber\":1}"
+					"raw": "{\"user\":\"2\",\"messageName\":\"itemWorkingRequest\",\"orderID\":2,\"itemLineNumber\":1}"
 				},
 				"url": {
 					"raw": "localhost:8083/makerSend",
@@ -304,7 +304,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"user\":\"1\",\"request\":\"cancelOrderedItemRequest\",\"orderID\":7,\"itemLineNumber\":3}"
+					"raw": "{\"user\":\"1\",\"messageName\":\"cancelOrderedItemRequest\",\"orderID\":3,\"itemLineNumber\":3}"
 				},
 				"url": {
 					"raw": "localhost:8082/waitersSend",
@@ -320,13 +320,13 @@
 			"response": []
 		},
 		{
-			"name": "localhost:8083/orderRequest2",
+			"name": "orderRequest2",
 			"request": {
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"user\":\"2\",\"proxySource\":\"\",\"request\":\"orderRequest\",\"areaVisualization\":false,\"area\":\"\"}"
+					"raw": "{\"user\":\"2\",\"proxySource\":\"\",\"messageName\":\"orderRequest\",\"areaVisualization\":false,\"area\":\"\"}"
 				},
 				"url": {
 					"raw": "localhost:8083/makerSend",
@@ -342,38 +342,13 @@
 			"response": []
 		},
 		{
-			"name": "localhost:8082/menuRequest",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\"user\":\"1\",\"proxySource\":\"\",\"request\":\"menuRequest\",\"areaVisualization\":true,\"areaMenu\":\"Forno\"}"
-				},
-				"url": {
-					"raw": "localhost:8082/waitersSend",
-					"host": [
-						"localhost"
-					],
-					"port": "8082",
-					"path": [
-						"waitersSend"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "http://localhost:8081/userWaiting",
+			"name": "putATableInWaitingForOrders",
 			"request": {
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"user\":\"1\",\"request\":\"userWaitingForOrderRequest\",\"tableID\":\"3\",\"tableRoomNumber\":1}"
+					"raw": "{\"user\":\"1\",\"messageName\":\"userWaitingForOrderRequest\",\"tableID\":\"2\",\"tableRoomNumber\":1}"
 				},
 				"url": {
 					"raw": "http://localhost:8081/acceptanceSend",
@@ -396,7 +371,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"user\":\"1\",\"request\":\"cancelOrderRequest\",\"orderID\":3}"
+					"raw": "{\"user\":\"1\",\"messageName\":\"cancelOrderRequest\",\"orderID\":3}"
 				},
 				"url": {
 					"raw": "localhost:8082/waitersSend",

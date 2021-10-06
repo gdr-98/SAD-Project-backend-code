@@ -23,40 +23,41 @@ public class DispatcherInfo {
     	Gson gson=new Gson();
     	
     	baseMessage rec=gson.fromJson(mex, baseMessage.class);	
-    	
-    	if(rec.request.equals(controllerIface.requests.tableRequest.name()))
-    		controllerFunctions.tableRequest(mex);
-    	
-    	else if(rec.request.equals(controllerIface.requests.userWaitingForOrderRequest.name()))
-    		controllerFunctions.userWaitingForOrderRequest(mex);
-    	
-    	else if(rec.request.equals(controllerIface.requests.freeTableRequest.name()))
-    		controllerFunctions.freeTableRequest(mex);
-    	
-    	else if(rec.request.equals(controllerIface.requests.itemCompleteRequest.name()))
-    		controllerFunctions.itemCompleteRequest(mex);
-    	
-    	else if(rec.request.equals(controllerIface.requests.itemWorkingRequest.name()))
-    		controllerFunctions.itemWorkingRequest(mex);
-    	
-    	else if(rec.request.equals(controllerIface.requests.orderRequest.name()))
-    		controllerFunctions.orderRequest(mex);
-       	
-    	else if(rec.request.equals(controllerIface.requests.menuRequest.name())) 
-    		controllerFunctions.menuRequest(mex);
-    	
-       
-    	else if(rec.request.equals(controllerIface.requests.orderToTableGenerationRequest.name()))
-    		controllerFunctions.orderToTableGenerationRequest(mex);
-    	
-    	else if(rec.request.equals(controllerIface.requests.cancelOrderRequest.name()))
-    		controllerFunctions.cancelOrderRequest(mex);
-    	
-    	else if(rec.request.equals(controllerIface.requests.cancelOrderedItemRequest.name()))
-    		controllerFunctions.cancelOrderedItemRequest(mex);
-    	
-    	else if(rec.request.equals(controllerIface.requests.loginRequest.name()))
-    		controllerFunctions.loginRequest(mex); 
+    	if(rec.messageName!=null) {
+	    	if(rec.messageName.equals(controllerIface.requests.tableRequest.name()))
+	    		controllerFunctions.tableRequest(mex);
+	    	
+	    	else if(rec.messageName.equals(controllerIface.requests.userWaitingForOrderRequest.name()))
+	    		controllerFunctions.userWaitingForOrderRequest(mex);
+	    	
+	    	else if(rec.messageName.equals(controllerIface.requests.freeTableRequest.name()))
+	    		controllerFunctions.freeTableRequest(mex);
+	    	
+	    	else if(rec.messageName.equals(controllerIface.requests.itemCompleteRequest.name()))
+	    		controllerFunctions.itemCompleteRequest(mex);
+	    	
+	    	else if(rec.messageName.equals(controllerIface.requests.itemWorkingRequest.name()))
+	    		controllerFunctions.itemWorkingRequest(mex);
+	    	
+	    	else if(rec.messageName.equals(controllerIface.requests.orderRequest.name()))
+	    		controllerFunctions.orderRequest(mex);
+	       	
+	    	else if(rec.messageName.equals(controllerIface.requests.menuRequest.name())) 
+	    		controllerFunctions.menuRequest(mex);
+	    	
+	       
+	    	else if(rec.messageName.equals(controllerIface.requests.orderToTableGenerationRequest.name()))
+	    		controllerFunctions.orderToTableGenerationRequest(mex);
+	    	
+	    	else if(rec.messageName.equals(controllerIface.requests.cancelOrderRequest.name()))
+	    		controllerFunctions.cancelOrderRequest(mex);
+	    	
+	    	else if(rec.messageName.equals(controllerIface.requests.cancelOrderedItemRequest.name()))
+	    		controllerFunctions.cancelOrderedItemRequest(mex);
+	    	
+	    	else if(rec.messageName.equals(controllerIface.requests.loginRequest.name()))
+	    		controllerFunctions.loginRequest(mex); 
+    	}
     		
     }
 }

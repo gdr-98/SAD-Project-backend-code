@@ -50,7 +50,7 @@ public class ReceiverJMS implements MessageListener {
         }
         /*Message Types
         tableRequest,
-                userWaitingForOrderRequest,  [n]
+                userWaitingNotification,  [n]
                 itemCompleteRequest,    [n]
                 menuRequest,    [1]
                 orderToTableGenerationRequest,  [1]
@@ -58,9 +58,9 @@ public class ReceiverJMS implements MessageListener {
                 cancelOrderedItemRequest,   [1]*/
 
 
-        switch (msg_received.request){
+        switch (msg_received.messageName){
             //In the case a client is waiting for ordination
-             case "userWaitingForOrderRequest" :
+             case "userWaitingNotification" :
                 for (Map.Entry<String, String> me : Webhook.Waiters.entrySet()) {
                      poster.createPost("http://"+ me.getValue()+"/notification",msg_to_send);
                 }

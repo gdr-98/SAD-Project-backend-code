@@ -4,6 +4,7 @@ import MenuAndWareHouseArea.MenuAndGoodsController;
 import MenuAndWareHouseArea.OrderedItemState;
 import RestaurantArea.Order;
 import RestaurantArea.RestaurantController;
+import RestaurantArea.TableState;
 import RestaurantArea.RestaurantController.returnCodes;
 import UsersData.UsersController;
 import messages.cancelOrderRequest;
@@ -68,7 +69,7 @@ public class SystemController  extends GeneralController implements controllerIf
 	 * 	request:	{
 	 * 					user:"userID"
 	 * 					proxySource:"NameOfTheProxySource"
-	 * 					request:"menuRequest"
+	 * 					messageName:"menuRequest"
 	 * 					areaVisualization:	"false/true"
 	 * 					areaMenu:"RequestedArea"(nameOfArea1/...)
 	 * 				}
@@ -105,7 +106,7 @@ public class SystemController  extends GeneralController implements controllerIf
 	 * 		request:	{
 	 * 					user:"userID"
 	 * 					proxySource:"NameOfTheProxySource"
-	 * 					request:"tableRequest"
+	 * 					messageName:"tableRequest"
 	 * 					forRoom:"true/false"
 	 * 					roomNumber:"roomNumber"
 	 * 					showItemsInArea:"true/false"
@@ -154,7 +155,7 @@ public class SystemController  extends GeneralController implements controllerIf
 	 * request:		{
 	 * 					user:"userID"
 	 * 					proxySource:"NameOfTheProxySource"
-	 * 					request:"userWaitingForOrderRequest"
+	 * 					messageName:"userWaitingForOrderRequest"
 	 * 					tableID:"tableIDValue"
 	 * 					tableRoomNumber:"tableRoomNumber"
 	 * 				}
@@ -169,6 +170,7 @@ public class SystemController  extends GeneralController implements controllerIf
 		Gson gson=new Gson();
 		tableOperation obj=gson.fromJson(request, tableOperation.class);
 		usersController.login(obj.user);
+		tableOperation notification=null;
 		if(this.usersController.checkRole(
 				obj.user
 				,UsersData.User.userRoles.Accoglienza.name()))
@@ -176,7 +178,9 @@ public class SystemController  extends GeneralController implements controllerIf
 			obj.response=this.controllerRestaurant.setTableWaiting(
 							obj.tableID,
 							obj.tableRoomNumber);
-			
+			//If the actual state is this
+			if(obj.response.equals(TableState.StatesList.waitingForOrders.name()))
+				notification=generateTableNotification(obj.tableRoomNumber,obj.tableID);
 			obj.result=results.roleOk.name();
 		}
 		else 
@@ -184,6 +188,8 @@ public class SystemController  extends GeneralController implements controllerIf
 			obj.result= results.roleFailed.name();
 		}
 		this.brokerIface.publishResponse(gson.toJson(obj,tableOperation.class));
+		if(notification!=null)
+			this.brokerIface.publishResponse(gson.toJson(notification,tableOperation.class));
 	}
 
 	/**
@@ -192,7 +198,7 @@ public class SystemController  extends GeneralController implements controllerIf
 	 * request:		{
 	 * 					user:"userID"
 	 * 					proxySource:"NameOfTheProxySource"
-	 * 					request:"freeTableRequest"
+	 * 					messageName:"freeTableRequest"
 	 * 					tableID:"tableIDValue"
 	 * 					tableRoomNumber:"tableRoomNumber"
 	 * 					
@@ -232,7 +238,7 @@ public class SystemController  extends GeneralController implements controllerIf
 	 * request:		{
 	 * 					user:"userID"
 	 * 					proxySource:"NameOfTheProxySource"
-	 * 					request:"orderToTableGenerationRequest"
+	 * 					messageName:"orderToTableGenerationRequest"
 	 * 					tableID:"tableIDValue"
 	 * 					tableRoomNumber:"tableRoomNumber"
 	 * 					orderParams{
@@ -293,7 +299,7 @@ public class SystemController  extends GeneralController implements controllerIf
 	 *  request:	{
 	 * 					user:"userID"
 	 * 					proxySource:"NameOfTheProxySource"
-	 * 					request:"cancelOrderRequest"
+	 * 					messageName:"cancelOrderRequest"
 	 * 					orderID: "idOfTheOrder"
 	 * 				}
 	 * response		{
@@ -328,7 +334,7 @@ public class SystemController  extends GeneralController implements controllerIf
 	 *  request:	{
 	 * 					user:"userID"
 	 * 					proxySource:"NameOfTheProxySource"
-	 * 					request:"cancelOrderedItemRequest"
+	 * 					messageName:"cancelOrderedItemRequest"
 	 * 					orderID: "idOfTheOrder"
 	 * 					itemLineNumber:"itemLineNumber"
 	 * 				}
@@ -358,13 +364,14 @@ public class SystemController  extends GeneralController implements controllerIf
 		this.brokerIface.publishResponse(gson.toJson(obj,messages.
 															itemOpRequest.class));
 	}
+	
 	/**
 	 * 
 	 * @param request
 	 *  request:	{
 	 * 					user:"userID"
 	 * 					proxySource:"NameOfTheProxySource"
-	 * 					request:"itemWorkingRequest"
+	 * 					messageName:"itemWorkingRequest"
 	 * 					orderID: "idOfTheOrder"
 	 * 					itemLineNumber:"itemLineNumber"
 	 * 				}
@@ -411,7 +418,7 @@ public class SystemController  extends GeneralController implements controllerIf
 	 *  request:	{
 	 * 					user:"userID"
 	 * 					proxySource:"NameOfTheProxySource"
-	 * 					request:"itemCompleteRequest"
+	 * 					messageName:"itemCompleteRequest"
 	 * 					orderID: "idOfTheOrder"
 	 * 					itemLineNumber:"itemLineNumber"
 	 * 				}
@@ -471,7 +478,7 @@ public class SystemController  extends GeneralController implements controllerIf
 	 *  request:	{
 	 * 					user:"userID"
 	 * 					proxySource:""
-	 * 					request:"orderRequest"
+	 * 					messageName:"orderRequest"
 	 * 					areaVisualization: "areaToShow"
 	 * 					area:"nameOfTheArwa"
 	 * 				}
@@ -543,7 +550,7 @@ public class SystemController  extends GeneralController implements controllerIf
 				helper=order.get().getJSONRepresentationAsCommande(area);
 				if(!helper.isBlank()) { //if there are items in that area
 					orderNotification helper2=new orderNotification();
-					helper2.request="orderNotification";
+					helper2.messageName="orderNotification";
 					helper2.area=area;
 					helper2.order=helper;
 					notifications.add(
@@ -553,5 +560,19 @@ public class SystemController  extends GeneralController implements controllerIf
 			}						
 		}
 		return notifications;
+	}
+	
+	/**
+	 * @info  When a client sits and is waiting for orders generate a table notification
+	 * @param tableRoomNumber
+	 * @param tableID
+	 * @return the new notification
+	 */
+	private tableOperation generateTableNotification(int tableRoomNumber,String tableID) {
+		tableOperation newOp=new tableOperation();
+		newOp.messageName="userWaitingNotification";
+		newOp.tableID=tableID;
+		newOp.tableRoomNumber=tableRoomNumber;
+		return newOp;
 	}
 }
