@@ -78,6 +78,5 @@ public class ReceiverJMS implements MessageListener {
                 log.info("Message does not match with any of the expected ones");
                 break;
         }
-
     }
 }

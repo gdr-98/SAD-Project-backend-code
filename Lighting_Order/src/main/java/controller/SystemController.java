@@ -3,7 +3,6 @@ package controller;
 import MenuAndWareHouseArea.MenuAndGoodsController;
 import MenuAndWareHouseArea.OrderedItemState;
 import RestaurantArea.Order;
-import RestaurantArea.Order.OrderStates;
 import RestaurantArea.RestaurantController;
 import RestaurantArea.RestaurantController.returnCodes;
 import UsersData.UsersController;
@@ -81,7 +80,6 @@ public class SystemController  extends GeneralController implements controllerIf
 	 */
 	@Override
 	public void menuRequest( String request) {
-			System.out.println("Received"+request);
 			Gson gson=new Gson();
 			menuRequest obj=gson.fromJson(request, menuRequest.class);
 			usersController.login(obj.user);
@@ -97,7 +95,6 @@ public class SystemController  extends GeneralController implements controllerIf
 			else {
 				obj.result=results.roleFailed.name();
 			}
-			System.out.println(obj.response);
 			this.brokerIface.publishResponse(gson.toJson(obj,menuRequest.class));
 			
 	}
@@ -265,22 +262,6 @@ public class SystemController  extends GeneralController implements controllerIf
 				,UsersData.User.userRoles.Cameriere.name() ))
 		{
 			obj.result=results.roleOk.name();
-			/*obj.response=
-					this.controllerRestaurant.generateOrderForTable
-					(		obj.orderParams.itemNames, 
-							obj.orderParams.addGoods,
-							obj.orderParams.subGoods, 
-							obj.orderParams.priority,
-							obj.tableId, obj.tableRoomNumber, Integer.valueOf(obj.user))
-					;*/
-			/*
-			obj.kitchenOrder=this.controllerRestaurant.getLastOrder().get().
-					getJSONRepresentation(Optional.of("Cucina"));
-			obj.bakeryOrder=this.controllerRestaurant.getLastOrder().get().
-					getJSONRepresentation(Optional.of("Forno"));
-			obj.barOrder=this.controllerRestaurant.getLastOrder().get().
-					getJSONRepresentation(Optional.of("Bar"));*/
-			
 			obj.response=	this.controllerRestaurant.generateOrderForTableId
 					(		obj.orderParams.itemNames, 
 							obj.orderParams.addGoods,
