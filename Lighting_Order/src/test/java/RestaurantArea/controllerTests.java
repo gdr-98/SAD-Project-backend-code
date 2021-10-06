@@ -22,7 +22,7 @@ import DataAccess.MenuDAOPSQL;
 import DataAccess.RestaurantDAOPSQL;
 import MenuAndWareHouseArea.MenuAndGoodsController;
 import MenuAndWareHouseArea.OrderedItem;
-
+@SuppressWarnings("deprecation")
 class controllerTests {
 	private MenuAndGoodsController controllerMenu;
 	private RestaurantController controllerRestaurant;

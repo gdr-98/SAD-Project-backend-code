@@ -510,4 +510,31 @@ public class RestaurantController {
 		return toRet;
 	}
 	
+	
+	/**
+ 	 * 
+ 	 * @param itemNames of the order
+ 	 * @param additive goods names
+ 	 * @param toSub names
+ 	 * @param priority of the item
+ 	 * @param userID creator
+ 	 * @return orderNotCreated or tableNotFound, else the JSONRepresenntationn of the order
+ 	 */
+	@Deprecated
+ 	public String generateOrderForTable(List<String>itemNames,List<List<String>> additive,List<List<String>>toSub,
+
+ 			List<Integer> priority,String tableID,int tableRoomNumber,Integer userID){
+ 		String toRet =returnCodes.tableNotFound.name();
+ 		Optional<Order> newOrder;
+ 		for(Table t:this.tables) {
+ 			if(t.isMe(tableID, tableRoomNumber)) {
+ 				newOrder=t.addOrder(itemNames, additive, toSub, priority, userID);
+ 				if(newOrder.isEmpty())
+ 					toRet=returnCodes.orderNotCreated.name();
+ 				else
+ 					toRet=newOrder.get().getJSONRepresentation(Optional.empty());
+ 			}
+ 		}
+ 		return toRet;
+ 	}
 }
