@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 import DataAccess.UserDAOPSQL;
+import RestaurantArea.Order;
 @Service
 public class UsersController {
 	
@@ -23,7 +24,7 @@ public class UsersController {
 	public List<User> users;
 	private ErrorCode ec;
 
-	UsersController() {
+	public UsersController() {
 		users = new ArrayList<User>();
 	}
 	
@@ -138,5 +139,22 @@ public class UsersController {
 			this.ec = UsersController.ErrorCode.UserFound;
 			return Optional.of(users.get(index-1));
 		}
+	}
+	/**
+	 * 
+	 * @param id of the user
+	 * @param o order to be inserted
+	 * @return empty if the user doesn't exists else optional.of operationn result
+	 */
+	public Optional<User> registerOrderToUser(String id,Order o) {
+		login(id);
+		Optional<User> user=this.getUserById(id);
+		boolean result;
+		if(user.isPresent()) {
+			result=user.get().registerOrder(o);
+			if(result)
+				return user;
+		}
+		return Optional.empty();
 	}
 }

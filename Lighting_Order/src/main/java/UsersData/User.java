@@ -7,8 +7,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
-
+ 
 import RestaurantArea.Order;
+
 
 /**JSON Format:
  * {
@@ -21,7 +22,7 @@ import RestaurantArea.Order;
 
 @Service
 public class User {
-	private List<Order> order;
+	private List<Order> orders;
 	private String name;
 	private String surname;
 	private String id;
@@ -100,5 +101,13 @@ public class User {
 			return true;
 		else
 			return false;
+	}
+	
+	public boolean registerOrder(Order o) {
+		
+		if(this.orders==null)
+			this.orders=new ArrayList<>();
+		return orders.add(o);
+		
 	}
 }

@@ -166,6 +166,7 @@ public class RestaurantDAOPSQL implements RestaurantDAO {
 									));
 				}
 				temp.put("orderedItems", (Object) ordered_item_json);
+				temp.put("userID", record.get("dipendente_id").toString());
 				to_return.put(temp);
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
@@ -405,6 +406,8 @@ public class RestaurantDAOPSQL implements RestaurantDAO {
 			order.addProperty("completedItemNumber", (Integer)results.get(0).get("item_completed"));
 			order.addProperty("tableRoomNumber",(Integer)results.get(0).get("tavolo_room") );
 			order.addProperty("tableID",results.get(0).get("tavolo_id").toString() );
+			order.addProperty("userID", results.get(0).get("dipendente_id").toString());
+			//temp.put("userID", record.get("dipendente_id").toString());
 			//Generiamo gli ordered items
 			//Prendo tutti gli item
 			query = "SELECT * FROM \"Restaurant\".\"ProdottoOrdinato\" WHERE ordine_id = '"+results.get(0).get("id").toString()+"'";

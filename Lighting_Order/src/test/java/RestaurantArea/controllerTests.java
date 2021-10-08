@@ -22,18 +22,23 @@ import DataAccess.MenuDAOPSQL;
 import DataAccess.RestaurantDAOPSQL;
 import MenuAndWareHouseArea.MenuAndGoodsController;
 import MenuAndWareHouseArea.OrderedItem;
+import UsersData.UsersController;
 @SuppressWarnings("deprecation")
 class controllerTests {
 	private MenuAndGoodsController controllerMenu;
 	private RestaurantController controllerRestaurant;
 	private MenuDAOPSQL dbMenu;
 	private RestaurantDAOPSQL dbRestaurant;
+	private UsersController uc;
 	@BeforeEach
 	void setup() {
 		this.dbRestaurant=new RestaurantDAOPSQL();
 		this.dbMenu=new  MenuDAOPSQL();
 		this.controllerMenu=new MenuAndGoodsController(this.dbMenu);
-		this.controllerRestaurant=new RestaurantController(this.dbRestaurant,this.controllerMenu);
+		
+		this.uc=new UsersController();
+		this.controllerRestaurant=new RestaurantController(this.dbRestaurant,this.controllerMenu,this.uc);
+		
 	}
 	
 	@AfterEach

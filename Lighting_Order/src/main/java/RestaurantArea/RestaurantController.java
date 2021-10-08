@@ -16,9 +16,11 @@ import org.springframework.stereotype.Service;
 import MenuAndWareHouseArea.MenuAndGoodsController;
 import MenuAndWareHouseArea.OrderedItem;
 import MenuAndWareHouseArea.OrderedItemState;
+import UsersData.User;
+import UsersData.UsersController;
 
 @Service
-@ComponentScan(basePackages= {"DataAccess"})
+@ComponentScan(basePackages= {"DataAccess","UsersData"})
 public class RestaurantController {
 	
 	public enum returnCodes{
@@ -37,10 +39,12 @@ public class RestaurantController {
 	private List<Order> orders=new ArrayList<>();
 	private RestaurantDAO db;
 	private MenuAndGoodsController menuAndWarehouseController;
+	private UsersController userController;
 	@Autowired
-	public RestaurantController(@Qualifier("psqlRestaurant")RestaurantDAO db,MenuAndGoodsController c) {
+	public RestaurantController(@Qualifier("psqlRestaurant")RestaurantDAO db,MenuAndGoodsController c,UsersController uc) {
 		this.db=db;
 		this.menuAndWarehouseController=c;
+		this.userController=uc;
 		 //retrieves all tables, the tables must ALWAYS be in the system
 		this.initTablesJSON(db.getAllTablesJSON());
 		
@@ -67,7 +71,9 @@ public class RestaurantController {
 	 * @info: utility function, the controller registers to the controller in his costructor
 	 * @param o order to be registered
 	 */
-	public void registerOrder(Order o) { this.orders.add(o);}
+	public void registerOrder(Order o) { 
+		this.orders.add(o);
+	}
 
 	/**
 	 * @return a reference to the DAO
@@ -509,8 +515,16 @@ public class RestaurantController {
 		}
 		return toRet;
 	}
-	
-	
+	/**
+	 * @info  this function is meant to be called from the order to register himself to the user
+	 * @param userID
+	 * @param o
+	 * @return optional of the user if the order was registered
+	 */
+	public Optional<User> askForOrderRegistration( String userID,Order o){ 
+		return this.userController.registerOrderToUser(userID, o);
+		
+	}
 	/**
  	 * 
  	 * @param itemNames of the order

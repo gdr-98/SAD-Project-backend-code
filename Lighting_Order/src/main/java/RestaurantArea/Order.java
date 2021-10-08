@@ -8,6 +8,7 @@ import com.google.gson.JsonParser;
 
 import MenuAndWareHouseArea.OrderedItem;
 import MenuAndWareHouseArea.OrderedItemState;
+import UsersData.User;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import java.util.Optional;
  *	"tableRoomNumber":"tableRoomValue"
  *	"tableID":"tableIDValue"
  *	"orderedItems" :[OrderedItemJsonRappresentation1,...]
+ *	"userID":	"userID"
  */
 public class Order {
 
@@ -61,7 +63,7 @@ public class Order {
 	@Expose(serialize=false,deserialize=false)
 	private RestaurantController controller;
 	
-	
+	private Optional<User> generator=null;
 	/**
 	 * 
 	 * @param id of the order
@@ -79,7 +81,7 @@ public class Order {
 		this.orderState=OrderStates.WaitingForWorking;
 		this.controller=controller;
 		this.orderedItems=generateItemRaw(itemsNames,additiveGoods,subGoods,priority);
-		
+		this.generator=Optional.empty();
 		//Insert ordered items
 		for(OrderedItem item:this.orderedItems)
 			item.setLineNumber(this.getGreatestLineNumber()+1);
@@ -90,6 +92,9 @@ public class Order {
 		
 		//register the order to the controller
 		this.controller.registerOrder(this);
+		
+		//register the order
+		this.generator=this.controller.askForOrderRegistration(userID.toString(), this);
 	}
 	
 	public Order(String jsonRepresentation,Optional<Table> t,RestaurantController controller) {
@@ -101,6 +106,7 @@ public class Order {
 		this.orderID=obj.get("orderID").getAsInt();
 		this.associatedTable=t;
 		this.controller=controller;
+		this.generator=Optional.empty();
 		this.completedItemNumber=obj.get("completedItemNumber").getAsInt();
 		//System.out.println(obj.get("orderState").getAsString());
 		this.orderState=OrderStates.valueOf(obj.get("orderState").getAsString());
@@ -127,10 +133,17 @@ public class Order {
 			item.changeAddGoods(helperList);
 			this.orderedItems.add(item);
 		}
+		
 		//register the order to the controller
 		this.controller.registerOrder(this);
+		
+		//Register the order to the user.
+		obj.get("userID").getAsString();
+		this.generator=this.controller.askForOrderRegistration(obj.get("userID").getAsString(), this);
 	}
 	
+	public void setUser(User u) {this.generator=Optional.of(u);}
+	public Optional<User> getUser() { return this.generator;}
 	/**
 	 * 
 	 * @param names of the items
@@ -257,7 +270,10 @@ public class Order {
 			to_ret.getAsJsonObject().addProperty("tableRoomNumber", this.associatedTable.get().getRoomNumber());
 			to_ret.getAsJsonObject().addProperty("tableID",this.associatedTable.get().getId());
 		}
-		
+		if(this.generator.isEmpty()) 
+			to_ret.getAsJsonObject().addProperty("userID", "");
+		else
+			to_ret.getAsJsonObject().addProperty("userID", this.generator.get().getId());
 		
 		to_ret.add("orderedItems", helper);
 		
