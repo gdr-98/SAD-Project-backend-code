@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 
@@ -15,34 +14,35 @@ import messages.loginRequest;
 import messages.orderNotification;
 @Service("SenderBrokerJMS")
 public class SenderBrokerJMS {
-		//given a role obtain the queue
-		private  final Map<String,String> roleToQueueMap=this.init_map();
+		
         @Autowired
         private JmsTemplate JmsTemp;
         
-        @Value("CodaBarBroker") 
-        private String barQueueBroker;
+        //@Value("CodaBarBroker") 
+        private static final String barQueueBroker="CodaBarBroker";
         
-        @Value("CodaPizzaioliBroker") 
-        private String bakeryQueueBroker;
+        //@Value("CodaPizzaioliBroker") 
+        private static final String bakeryQueueBroker="CodaPizzaioliBroker";
         
-        @Value("CodaChefBroker") 
-        private String kitchenQueueBroker;
+        //@Value("CodaChefBroker") 
+        private static final String kitchenQueueBroker="CodaChefBroker";
         
-        @Value("CodaCamerieriBroker")
-        private String waitersQueueBroker;
+       // @Value("CodaCamerieriBroker")
+        private static final String waitersQueueBroker="CodaCamerieriBroker";
         
-        @Value("CodaAccoglienzaBroker")
-        private String acceptanceQueueBroker;
+        //@Value("CodaAccoglienzaBroker")
+        private static final String acceptanceQueueBroker="CodaAccoglienzaBroker";
         
-        
-        private Map<String,String>init_map (){
+        //given a role obtain the queue
+        private  final Map<String,String> roleToQueueMap=this.init_map();
+      			
+        private   Map<String,String>init_map (){
         	Map<String,String>help=new HashMap<String,String>();
-        	help.put(User.userRoles.Accoglienza.name(), this.acceptanceQueueBroker);
-        	help.put(User.userRoles.Cameriere.name(), this.waitersQueueBroker);
-        	help.put(User.userRoles.Bar.name(),this.barQueueBroker);
-        	help.put(User.userRoles.Forno.name(),this.bakeryQueueBroker);
-        	help.put(User.userRoles.Cucina.name(), this.kitchenQueueBroker);
+        	help.put(User.userRoles.Accoglienza.name(),acceptanceQueueBroker );
+        	help.put(User.userRoles.Cameriere.name(),waitersQueueBroker );
+        	help.put(User.userRoles.Bar.name(),barQueueBroker);
+        	help.put(User.userRoles.Forno.name(),bakeryQueueBroker);
+        	help.put(User.userRoles.Cucina.name(), kitchenQueueBroker);
         	return help;
         }
         
@@ -54,6 +54,7 @@ public class SenderBrokerJMS {
          * @param message
          */
         public void send(String queueName,String message) {
+        	
         	JmsTemp.convertAndSend(queueName,message);
         }   
         
@@ -134,6 +135,7 @@ public class SenderBrokerJMS {
     	public void sendRegisterNotification(String message) {
     		Gson gson=new Gson();		
 			loginRequest not=gson.fromJson(message, loginRequest.class);
-    		this.send(this.roleToQueueMap.get(not.result), message);
+			if(this.roleToQueueMap.containsKey(not.result))
+				this.send(this.roleToQueueMap.get(not.result), message);
     	}
 }

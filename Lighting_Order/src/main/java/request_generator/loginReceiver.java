@@ -17,6 +17,7 @@ public class loginReceiver implements MessageListener {
     @Override
     public void onMessage(Message message) {
         try {
+        	
             received = (String) message.getBody(String.class);
             dispatcherInfo.callerFactory(received);
             

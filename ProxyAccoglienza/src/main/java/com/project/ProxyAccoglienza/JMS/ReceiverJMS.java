@@ -8,12 +8,16 @@ import com.project.ProxyAccoglienza.web.Webhook;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Service;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Map;
 
 
@@ -28,6 +32,10 @@ public class ReceiverJMS implements MessageListener {
     private final Post poster = new Post();
 
     private final Logger log = LoggerFactory.getLogger(ReceiverJMS.class);
+
+
+    @Value("${server.port}")
+    public String address_port;
 
     @JmsListener(destination = "CodaAccoglienzaBroker")
     @Override
@@ -66,6 +74,11 @@ public class ReceiverJMS implements MessageListener {
             case "registerNotification":
                 LoginResponse resp=gson.fromJson(msg_to_send,LoginResponse.class);
                 Webhook.Add_Acceptance(resp.user,resp.url);
+                log.info("Added user "+resp.user+"with url"+resp.url);
+
+                //NNow set the url to post
+                resp.url= getPostAddress()+"/acceptanceSend";
+                msg_to_send=gson.toJson(resp,LoginResponse.class);
                 if( Webhook.Acceptance.containsKey(msg_received.user)) //if the name exists
                     poster.createPost("http://"+ Webhook.Acceptance.get(msg_received.user)+"/notification",msg_to_send);
                 break;
@@ -75,5 +88,14 @@ public class ReceiverJMS implements MessageListener {
         }
 
         log.info("Event received: " + msg_received);
+    }
+    private String getPostAddress(){
+        String address="";
+        try {
+            address= InetAddress.getLocalHost().getHostAddress()+":"+this.address_port;
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        return address;
     }
 }

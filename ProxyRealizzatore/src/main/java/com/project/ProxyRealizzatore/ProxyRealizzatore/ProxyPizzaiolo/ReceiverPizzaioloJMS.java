@@ -7,12 +7,16 @@ import com.project.ProxyRealizzatore.ProxyRealizzatore.web.Post;
 import com.project.ProxyRealizzatore.ProxyRealizzatore.web.Webhook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Service;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Map;
 
 @Service
@@ -21,6 +25,9 @@ public class ReceiverPizzaioloJMS implements MessageListener {
     private final Post poster = new Post();
 
     private final Logger log = LoggerFactory.getLogger(ReceiverPizzaioloJMS.class);
+
+    @Value("${server.port}")
+    public String address_port;
 
     @JmsListener(destination = "CodaPizzaioliBroker")
     @Override
@@ -62,6 +69,11 @@ public class ReceiverPizzaioloJMS implements MessageListener {
             case "registerNotification":
                    LoginResponse resp=gson.fromJson(msg_to_send,LoginResponse.class);
                    Webhook.Add_Pizza_maker(resp.user,resp.url);
+                   //Add user url
+                   log.info("Added user "+resp.user+"with url"+resp.url);
+                   //NNow set the url to post
+                   resp.url= getPostAddress()+"/makerSend";
+                   msg_to_send=gson.toJson(resp,LoginResponse.class);
                     if( Webhook.Pizza_maker.containsKey(msg_received.user)) //if the name exists
                         poster.createPost("http://"+ Webhook.Pizza_maker.get(msg_received.user)+"/notification",msg_to_send);
                    break;
@@ -69,5 +81,14 @@ public class ReceiverPizzaioloJMS implements MessageListener {
                 log.info("Message does not match with any of the expected ones");
                 break;
         }
+    }
+    private String getPostAddress(){
+        String address="";
+        try {
+             address= InetAddress.getLocalHost().getHostAddress()+":"+this.address_port;
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        return address;
     }
 }

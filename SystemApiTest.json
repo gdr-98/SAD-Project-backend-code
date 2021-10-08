@@ -385,6 +385,28 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"user\":\"1\" ,\"messageName\":\"loginRequest\",\"url\":\"localhost:696969\"}"
+				},
+				"url": {
+					"raw": "localhost:8085/loginSend",
+					"host": [
+						"localhost"
+					],
+					"port": "8085",
+					"path": [
+						"loginSend"
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }

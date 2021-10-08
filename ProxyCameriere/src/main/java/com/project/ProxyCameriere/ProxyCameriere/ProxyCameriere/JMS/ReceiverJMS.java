@@ -9,11 +9,19 @@ import com.project.ProxyCameriere.ProxyCameriere.web.Webhook;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.jms.annotation.JmsListener;
+import org.springframework.jms.listener.adapter.ListenerExecutionFailedException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpServerErrorException;
+
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
+import java.net.ConnectException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Map;
 
 
@@ -28,7 +36,8 @@ public class ReceiverJMS implements MessageListener {
     private final Post poster = new Post();
 
     private final Logger log = LoggerFactory.getLogger(ReceiverJMS.class);
-
+    @Value("${server.port}")
+    public String address_port;
     @JmsListener(destination = "CodaCamerieriBroker")
     @Override
     public void onMessage(@NotNull Message message) {
@@ -78,13 +87,28 @@ public class ReceiverJMS implements MessageListener {
             //adds a new user and notify
             case "registerNotification":
                 LoginResponse resp=gson.fromJson(msg_to_send,LoginResponse.class);
-                Webhook.Add_Pizza_maker(resp.user,resp.url);
-                if( Webhook.Pizza_maker.containsKey(msg_received.user)) //if the name exists
-                    poster.createPost("http://"+ Webhook.Waiters.get(msg_received.user)+"/notification",msg_to_send);
+                Webhook.Add_Waiter(resp.user,resp.url);
+                //NNow set the url to post
+                resp.url= getPostAddress()+"/waitersSend";
+                msg_to_send=gson.toJson(resp,LoginResponse.class);
+                if( Webhook.Waiters.containsKey(msg_received.user)) { //if the name exists
+
+                        log.info("Sending to"+"http://" + Webhook.Waiters.get(msg_received.user));
+                        poster.createPost("http://" + Webhook.Waiters.get(msg_received.user) + "/notification", msg_to_send);
+                  }
                 break;
             default :
                 log.info("Message does not match with any of the expected ones");
                 break;
         }
+    }
+    private String getPostAddress(){
+        String address="";
+        try {
+            address= InetAddress.getLocalHost().getHostAddress()+":"+this.address_port;
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        return address;
     }
 }
