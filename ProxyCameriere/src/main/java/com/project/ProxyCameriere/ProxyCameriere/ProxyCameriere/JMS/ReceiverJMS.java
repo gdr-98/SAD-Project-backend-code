@@ -3,6 +3,7 @@ package com.project.ProxyCameriere.ProxyCameriere.ProxyCameriere.JMS;
 import com.fasterxml.jackson.databind.ser.Serializers;
 import com.google.gson.Gson;
 import com.project.ProxyCameriere.ProxyCameriere.web.BaseMessage;
+import com.project.ProxyCameriere.ProxyCameriere.web.LoginResponse;
 import com.project.ProxyCameriere.ProxyCameriere.web.Post;
 import com.project.ProxyCameriere.ProxyCameriere.web.Webhook;
 import org.jetbrains.annotations.NotNull;
@@ -55,7 +56,8 @@ public class ReceiverJMS implements MessageListener {
                 menuRequest,    [1]
                 orderToTableGenerationRequest,  [1]
                 cancelOrderRequest,     [1]
-                cancelOrderedItemRequest,   [1]*/
+                cancelOrderedItemRequest,   [1]
+                registerNotification*/
 
 
         switch (msg_received.messageName){
@@ -73,7 +75,13 @@ public class ReceiverJMS implements MessageListener {
                         log.info(msg_to_send);
                     }
                     break;
-
+            //adds a new user and notify
+            case "registerNotification":
+                LoginResponse resp=gson.fromJson(msg_to_send,LoginResponse.class);
+                Webhook.Add_Pizza_maker(resp.user,resp.url);
+                if( Webhook.Pizza_maker.containsKey(msg_received.user)) //if the name exists
+                    poster.createPost("http://"+ Webhook.Waiters.get(msg_received.user)+"/notification",msg_to_send);
+                break;
             default :
                 log.info("Message does not match with any of the expected ones");
                 break;

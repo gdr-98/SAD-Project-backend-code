@@ -2,6 +2,7 @@ package com.project.ProxyAccoglienza.JMS;
 
 import com.google.gson.Gson;
 import com.project.ProxyAccoglienza.web.BaseMessage;
+import com.project.ProxyAccoglienza.web.LoginResponse;
 import com.project.ProxyAccoglienza.web.Post;
 import com.project.ProxyAccoglienza.web.Webhook;
 import org.jetbrains.annotations.NotNull;
@@ -52,12 +53,20 @@ public class ReceiverJMS implements MessageListener {
         tableRequest,
         freeTableRequest,
         userWaitingForOrdersRequest
+        registerNotification
          */
 
         switch (msg_received.messageName) {
             //Semplici messaggi di conferma che vanno al singolo
             case "tableRequest" : case "userWaitingForOrderRequest": case "freeTableRequest":
                 if(Webhook.Acceptance.containsKey(msg_received.user))
+                    poster.createPost("http://"+ Webhook.Acceptance.get(msg_received.user)+"/notification",msg_to_send);
+                break;
+            //adds a new user and notify
+            case "registerNotification":
+                LoginResponse resp=gson.fromJson(msg_to_send,LoginResponse.class);
+                Webhook.Add_Acceptance(resp.user,resp.url);
+                if( Webhook.Acceptance.containsKey(msg_received.user)) //if the name exists
                     poster.createPost("http://"+ Webhook.Acceptance.get(msg_received.user)+"/notification",msg_to_send);
                 break;
             default:

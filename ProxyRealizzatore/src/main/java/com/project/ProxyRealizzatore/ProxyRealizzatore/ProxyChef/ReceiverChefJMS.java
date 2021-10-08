@@ -2,6 +2,7 @@ package com.project.ProxyRealizzatore.ProxyRealizzatore.ProxyChef;
 
 import com.google.gson.Gson;
 import com.project.ProxyRealizzatore.ProxyRealizzatore.web.BaseMessage;
+import com.project.ProxyRealizzatore.ProxyRealizzatore.web.LoginResponse;
 import com.project.ProxyRealizzatore.ProxyRealizzatore.web.Post;
 import com.project.ProxyRealizzatore.ProxyRealizzatore.web.Webhook;
 import org.slf4j.Logger;
@@ -42,7 +43,8 @@ public class ReceiverChefJMS implements MessageListener {
         /*
         itemCompleteRequest,
         itemWorkingRequest,
-        orderNotification
+        orderNotification,
+        registerNotification
          */
 
         switch (msg_received.messageName) {
@@ -55,6 +57,13 @@ public class ReceiverChefJMS implements MessageListener {
             for (Map.Entry<String, String> me : Webhook.Pizza_maker.entrySet())
                 poster.createPost("http://"+ me.getValue()+"/notification",msg_to_send);
             break;
+            //adds a new user and notify
+            case "registerNotification":
+                LoginResponse resp=gson.fromJson(msg_to_send,LoginResponse.class);
+                Webhook.Add_Chef(resp.user,resp.url);
+                if( Webhook.Chef.containsKey(msg_received.user)) //if the name exists
+                    poster.createPost("http://"+ Webhook.Chef.get(msg_received.user)+"/notification",msg_to_send);
+                break;
             default:
                 log.info("Message does not match with any of the expected ones");
                 break;

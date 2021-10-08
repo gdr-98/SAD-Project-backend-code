@@ -557,8 +557,9 @@ public class SystemController  extends GeneralController implements controllerIf
 	 * 				}
 	 * Notification:
 	 * 				{
+	 * 						"user"=userID
 	 * 						"messageName"="registerNotification"
-	 *						result="role"
+	 *						"result"=role
 	 *						"url"=url to make posts
 	 * 				}
 	 */

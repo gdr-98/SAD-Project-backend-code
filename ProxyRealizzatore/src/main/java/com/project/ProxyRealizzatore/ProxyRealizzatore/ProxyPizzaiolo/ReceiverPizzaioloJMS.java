@@ -2,6 +2,7 @@ package com.project.ProxyRealizzatore.ProxyRealizzatore.ProxyPizzaiolo;
 
 import com.google.gson.Gson;
 import com.project.ProxyRealizzatore.ProxyRealizzatore.web.BaseMessage;
+import com.project.ProxyRealizzatore.ProxyRealizzatore.web.LoginResponse;
 import com.project.ProxyRealizzatore.ProxyRealizzatore.web.Post;
 import com.project.ProxyRealizzatore.ProxyRealizzatore.web.Webhook;
 import org.slf4j.Logger;
@@ -43,18 +44,27 @@ public class ReceiverPizzaioloJMS implements MessageListener {
         itemCompleteRequest,
         itemWorkingRequest,
         orderNotification
-         */
+        registerNotification
+        */
 
         switch (msg_received.messageName) {
 
             case "itemCompleteRequest": case "itemWorkingRequest": case "orderRequest":
-                if( Webhook.Chef.containsKey(msg_received.user)) //if the name exists
-                    poster.createPost("http://"+ Webhook.Chef.get(msg_received.user)+"/notification",msg_to_send);
+                if( Webhook.Pizza_maker.containsKey(msg_received.user)) //if the name exists
+                    poster.createPost("http://"+ Webhook.Pizza_maker.get(msg_received.user)+"/notification",msg_to_send);
                 break;
             case "orderNotification":
                 for (Map.Entry<String, String> me : Webhook.Pizza_maker.entrySet())
                     poster.createPost("http://"+ me.getValue()+"/notification",msg_to_send);
                 break;
+
+            //adds a new user and notify
+            case "registerNotification":
+                   LoginResponse resp=gson.fromJson(msg_to_send,LoginResponse.class);
+                   Webhook.Add_Pizza_maker(resp.user,resp.url);
+                    if( Webhook.Pizza_maker.containsKey(msg_received.user)) //if the name exists
+                        poster.createPost("http://"+ Webhook.Pizza_maker.get(msg_received.user)+"/notification",msg_to_send);
+                   break;
             default:
                 log.info("Message does not match with any of the expected ones");
                 break;
