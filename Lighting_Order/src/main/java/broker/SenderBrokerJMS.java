@@ -1,15 +1,22 @@
 package broker;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
+
+import UsersData.User;
+import messages.loginRequest;
 import messages.orderNotification;
 @Service("SenderBrokerJMS")
 public class SenderBrokerJMS {
-
+		//given a role obtain the queue
+		private  final Map<String,String> roleToQueueMap=this.init_map();
         @Autowired
         private JmsTemplate JmsTemp;
         
@@ -27,6 +34,18 @@ public class SenderBrokerJMS {
         
         @Value("CodaAccoglienzaBroker")
         private String acceptanceQueueBroker;
+        
+        
+        private Map<String,String>init_map (){
+        	Map<String,String>help=new HashMap<String,String>();
+        	help.put(User.userRoles.Accoglienza.name(), this.acceptanceQueueBroker);
+        	help.put(User.userRoles.Cameriere.name(), this.waitersQueueBroker);
+        	help.put(User.userRoles.Bar.name(),this.barQueueBroker);
+        	help.put(User.userRoles.Forno.name(),this.bakeryQueueBroker);
+        	help.put(User.userRoles.Cucina.name(), this.kitchenQueueBroker);
+        	return help;
+        }
+        
         
         /**
          * 
@@ -101,5 +120,20 @@ public class SenderBrokerJMS {
 					break;
 			}
     		
+    	}
+    	/**
+    	 *  Inoltra la risposta al proxy login
+    	 */
+    	public void sendLoginInfo(String message) {
+    		//Empty
+    	}
+    	
+    	/*
+    	 * inoltra una register notification ad un proxy
+    	 */
+    	public void sendRegisterNotification(String message) {
+    		Gson gson=new Gson();		
+			loginRequest not=gson.fromJson(message, loginRequest.class);
+    		this.send(this.roleToQueueMap.get(not.result), message);
     	}
 }

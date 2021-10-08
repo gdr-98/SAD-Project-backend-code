@@ -9,6 +9,7 @@ import RestaurantArea.RestaurantController.returnCodes;
 import UsersData.UsersController;
 import messages.cancelOrderRequest;
 import messages.itemOpRequest;
+import messages.loginRequest;
 import messages.menuRequest;
 import messages.orderNotification;
 import messages.orderRequest;
@@ -21,12 +22,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 
 
 /**
@@ -164,6 +165,12 @@ public class SystemController  extends GeneralController implements controllerIf
 	 * 					result: "roleFailed/roleOk"
 	 * 					response:tableJsonRepresentation
 	 * 				}
+	 * Notification:
+	 * 				{
+	 * 						messageName="userWaitingNotification"
+	 *						"tableID"=tableID
+	 *						"tableRoomNumber"=tableRoomNumber
+	 * 				}
 	 */
 	@Override
 	public void userWaitingForOrderRequest(String request) {
@@ -254,7 +261,13 @@ public class SystemController  extends GeneralController implements controllerIf
 	 * 					request
 	 * 					result: "roleFailed/roleOk"
 	 * 				}
-	 *
+	 * Notification(1 for each item area)
+	 * 			:
+	 *				{
+	 *					messageName:"orderNotification"
+	 *					area:"itemsArea"
+	 *					order: orderJsonRepresentation
+	 *				}
 	 */
 	@Override
 	public void orderToTableGenerationRequest(String request) {
@@ -426,7 +439,15 @@ public class SystemController  extends GeneralController implements controllerIf
 	 * 					result:	roleOk/roleFailed/orderNotFound/itemFound/itemNotFound
 	 * 					response:true/false
 	 *				}
+	 * Notifications(1 for each item area)
+	 * 			:
+	 *				{
+	 *					messageName:"orderNotification"
+	 *					area:"itemsArea"
+	 *					order: orderJsonRepresentation
+	 *				}
 	 */
+	 
 	@Override
 	public void itemCompleteRequest(String request) {
 		
@@ -520,10 +541,46 @@ public class SystemController  extends GeneralController implements controllerIf
 	
 	}
 
-
+	
+	/**
+	 * @info an employe of the local logs in the application
+	 * @param Request, alter a table state and publish the response to the broker
+	 * request:		{
+	 * 					user:"userID"
+	 * 					proxySource:"NameOfTheProxySource"
+	 * 					messageName:"loginRequest"
+	 * 					url:url to make posts
+	 * 				}
+	 * 	response:	{
+	 * 					request
+	 * 					response:[roleName1....roleNameN]
+	 * 				}
+	 * Notification:
+	 * 				{
+	 * 						"messageName"="registerNotification"
+	 *						result="role"
+	 *						"url"=url to make posts
+	 * 				}
+	 */
 	@Override
 	public void loginRequest(String request) {
 		// TODO Auto-generated method stub
+		Gson gson=new Gson();
+		loginRequest obj=gson.fromJson(request, loginRequest.class);
+		List<loginRequest> notifications=new ArrayList<>();
+		List<String>roles=this.usersController.login(obj.user);
+		JsonArray array=new JsonArray();
+		for(String role : roles) {
+			notifications.add(generateRegisterNotification(obj.user,obj.url,role));
+			array.add(role);
+		}
+		obj.response=array.toString();
+		
+		//publish the login Request
+		this.brokerIface.publishResponse(gson.toJson(obj,loginRequest.class));
+		//Publish the Register Notifications
+		for(loginRequest notification:notifications) 
+			this.brokerIface.publishResponse(gson.toJson(notification,loginRequest.class));
 		
 	}
 	
@@ -574,5 +631,22 @@ public class SystemController  extends GeneralController implements controllerIf
 		newOp.tableID=tableID;
 		newOp.tableRoomNumber=tableRoomNumber;
 		return newOp;
+	}
+	
+	/**
+	 * @info  Generates a register notification
+	 * @param user id 
+	 * @param url to post to the user
+	 * @param role of the user
+	 * @return the RegisterNotification message
+	 */
+	private loginRequest generateRegisterNotification(String user,
+			String url,String role) {
+		loginRequest toRet =new loginRequest();
+		toRet.user=user;
+		toRet.url=url;
+		toRet.result=role;
+		toRet.messageName="registerNotification";
+		return toRet;
 	}
 }

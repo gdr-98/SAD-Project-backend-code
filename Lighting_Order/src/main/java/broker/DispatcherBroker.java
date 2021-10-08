@@ -33,6 +33,7 @@ package broker;
  * List of notification:
  * 	1-orderNotification
  * 	2-userWaitingNotification
+ * 	3-registerNotification
  */
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -86,6 +87,17 @@ public class DispatcherBroker implements BrokerInterface{
 		case "userWaitingNotification":
 			//I camerieri devono essere informati che un utente voglia ordinare
 			sender.sendWaitersNotification(response);
+			break;
+		
+		//13
+		case "loginRequest":
+			sender.sendLoginInfo(response);
+			break;
+			
+		//14
+		case "registerNotification":
+			sender.sendRegisterNotification(response);
+			break;
 		
 		default: //Invalid request
 			break;
