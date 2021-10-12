@@ -18,7 +18,7 @@ public class MenuDAOPSQL implements MenuAndWarehouseDAO {
 	private JdbcTemplate database;
 	
 	public static final String DRIVER = "org.postgresql.Driver";
-    public static final String JDBC_URL = "jdbc:postgresql://localhost:5432/postgres";
+    public static final String JDBC_URL = "jdbc:postgresql://localhost:5432/lightingOrder";
     public static final String USERNAME = "postgres";
     public static final String PASSWORD = "porcodio";
 	

@@ -174,7 +174,7 @@ public class Order {
 			to_add.setLineNumber(this.getGreatestLineNumber()+1); 
 			orderedItems.add(to_add);
 			//Add the item in the database
-			this.controller.getDB().addOrderedItem(to_add.getJSONRepresentation(), 
+			this.controller.getDB().addOrderedItemByJSON(to_add.getJSONRepresentation(), 
 					this.orderID);	
 	}
 	/**
@@ -341,7 +341,7 @@ public class Order {
 			//If the state is working, so it was really updated
 			if(item.getState().equals("Working")) {
 				//Update the item in the database
-				this.controller.getDB().updateOrderedItem(item.getJSONRepresentation(), this.orderID);
+				this.controller.getDB().updateOrderedItemByJSON(item.getJSONRepresentation(), this.orderID);
 				//if it was the first update the order status
 				if(this.orderState.name().equals("WaitingForWorking")) 
 					//if it was the first then set completed
@@ -382,7 +382,7 @@ public class Order {
 				//update the database
 				this.controller.getDB().
 					updateOrderByJSON(this.getJSONRepresentation(Optional.empty()));
-				this.controller.getDB().updateOrderedItem(item.getJSONRepresentation(), this.orderID);
+				this.controller.getDB().updateOrderedItemByJSON(item.getJSONRepresentation(), this.orderID);
 				return true;
 			}
 			else 
@@ -443,7 +443,7 @@ public class Order {
 		else {
 			item=helper.get();
 			toRet=item.changeAddGoods(additiveGoods);
-			this.controller.getDB().updateOrderedItem(item.getJSONRepresentation(), this.orderID);
+			this.controller.getDB().updateOrderedItemByJSON(item.getJSONRepresentation(), this.orderID);
 			return Optional.of(toRet);
 		}
 	}
@@ -465,7 +465,7 @@ public class Order {
 		else {
 			item=helper.get();
 			toRet=item.changeSubGoods(subGoods);
-			this.controller.getDB().updateOrderedItem(item.getJSONRepresentation(), this.orderID);
+			this.controller.getDB().updateOrderedItemByJSON(item.getJSONRepresentation(), this.orderID);
 			return Optional.of(toRet);
 		}
 	}
@@ -485,7 +485,7 @@ public class Order {
 		else {
 			item=helper.get();
 			toRet=item.changePriority(newPriority);
-			this.controller.getDB().updateOrderedItem(item.getJSONRepresentation(), this.orderID);
+			this.controller.getDB().updateOrderedItemByJSON(item.getJSONRepresentation(), this.orderID);
 			return Optional.of(toRet);
 		}
 	}
