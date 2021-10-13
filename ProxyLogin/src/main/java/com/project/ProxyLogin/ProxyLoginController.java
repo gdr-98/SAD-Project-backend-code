@@ -20,6 +20,7 @@ public class ProxyLoginController {
             "id": pepped
             "url": 192.168.1.x:YYYY
         */
+
         sender.sendMessage(Login_msg);  //Invio su CodaLogin
         return new ResponseEntity<>("[Login Request] - Received from Proxy", HttpStatus.OK);
     }

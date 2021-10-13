@@ -1,7 +1,6 @@
 package com.project.ProxyAccoglienza;
 
 
-import com.project.ProxyAccoglienza.JMS.LoginReceiverJMS;
 import com.project.ProxyAccoglienza.JMS.ReceiverJMS;
 import com.project.ProxyAccoglienza.JMS.SenderJMS;
 import org.slf4j.Logger;
@@ -25,9 +24,6 @@ public class ProxyAccoglienzaController {
 
     @Autowired
     private SenderJMS sender;
-
-    @Autowired
-    private LoginReceiverJMS lreceiver;
 
     private final Logger log = LoggerFactory.getLogger(com.project.ProxyAccoglienza.ProxyAccoglienzaController.class);
 

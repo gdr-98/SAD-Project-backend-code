@@ -70,10 +70,11 @@ public class ReceiverChefJMS implements MessageListener {
                 Webhook.Add_Chef(resp.user,resp.url);
                 log.info("Added user "+resp.user+"with url"+resp.url);
                 //NNow set the url to post
-                resp.url= getPostAddress()+"/makerSend";
+                resp.proxySource= getProxyAddress()+"/makerSend";
                 msg_to_send=gson.toJson(resp,LoginResponse.class);
                 if( Webhook.Chef.containsKey(msg_received.user)) //if the name exists
-                    poster.createPost("http://"+ Webhook.Chef.get(msg_received.user)+"/notification",msg_to_send);
+                    log.info("Sending to "+"http://" + Webhook.Chef.get(msg_received.user));
+                    poster.createPost("http://"+ Webhook.Chef.get(msg_received.user)+"/login",msg_to_send);
                 break;
             default:
                 log.info("Message does not match with any of the expected ones");
@@ -81,7 +82,7 @@ public class ReceiverChefJMS implements MessageListener {
         }
 
     }
-    private String getPostAddress(){
+    private String getProxyAddress(){
         String address="";
         try {
             address= InetAddress.getLocalHost().getHostAddress()+":"+this.address_port;
