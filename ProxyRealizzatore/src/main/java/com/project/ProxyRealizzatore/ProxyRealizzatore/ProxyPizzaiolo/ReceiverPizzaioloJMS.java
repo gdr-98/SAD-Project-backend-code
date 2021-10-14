@@ -58,7 +58,7 @@ public class ReceiverPizzaioloJMS implements MessageListener {
 
             case "itemCompleteRequest": case "itemWorkingRequest": case "orderRequest":
                 if( Webhook.Pizza_maker.containsKey(msg_received.user)) //if the name exists
-                    poster.createPost("http://"+ Webhook.Pizza_maker.get(msg_received.user)+"/notification",msg_to_send);
+                    poster.createPost("http://"+ Webhook.Pizza_maker.get(msg_received.user)+"/request",msg_to_send);
                 break;
             case "orderNotification":
                 for (Map.Entry<String, String> me : Webhook.Pizza_maker.entrySet())

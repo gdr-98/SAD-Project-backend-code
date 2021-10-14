@@ -38,6 +38,7 @@ public class ReceiverJMS implements MessageListener {
     private final Logger log = LoggerFactory.getLogger(ReceiverJMS.class);
     @Value("${server.port}")
     public String address_port;
+
     @JmsListener(destination = "CodaCamerieriBroker")
     @Override
     public void onMessage(@NotNull Message message) {
@@ -80,7 +81,7 @@ public class ReceiverJMS implements MessageListener {
             case "menuRequest" : case "cancelOrderedItemRequest" : case "orderToTableGenerationRequest" :
                 case "cancelOrderRequest" : case "tableRequest":
                     if(Webhook.Waiters.containsKey(msg_received.user)) {
-                        poster.createPost("http://" + Webhook.Waiters.get(msg_received.user) + "/notification", msg_to_send);
+                        poster.createPost("http://" + Webhook.Waiters.get(msg_received.user) + "/request", msg_to_send);
                         log.info(msg_to_send);
                     }
                     break;

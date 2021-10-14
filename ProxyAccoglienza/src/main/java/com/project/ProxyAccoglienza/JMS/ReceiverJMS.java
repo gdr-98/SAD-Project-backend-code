@@ -66,7 +66,7 @@ public class ReceiverJMS implements MessageListener {
             //Semplici messaggi di conferma che vanno al singolo
             case "tableRequest" : case "userWaitingForOrderRequest": case "freeTableRequest":
                 if(Webhook.Acceptance.containsKey(msg_received.user))
-                    poster.createPost("http://"+ Webhook.Acceptance.get(msg_received.user)+"/notification",msg_to_send);
+                    poster.createPost("http://"+ Webhook.Acceptance.get(msg_received.user)+"/request",msg_to_send);
                 break;
             //adds a new user and notify
             case "registerNotification":

@@ -21,9 +21,9 @@ public class RestaurantDAOPSQL implements RestaurantDAO {
 	private JdbcTemplate database;
 	
 	public static final String DRIVER = "org.postgresql.Driver";
-    public static final String JDBC_URL = "jdbc:postgresql://localhost:5432/postgres";
+    public static final String JDBC_URL = "jdbc:postgresql://localhost:5432/lightningOrder";
     public static final String USERNAME = "postgres";
-    public static final String PASSWORD = "porcodio";
+    public static final String PASSWORD = "postgre";
     
     public RestaurantDAOPSQL() {
     	DriverManagerDataSource dataSource = new DriverManagerDataSource();
