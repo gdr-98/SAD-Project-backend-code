@@ -8,10 +8,11 @@ The name backend is trivial since this is just che code of the "central" system 
   
   It is composed of 3 part: an android application, a central system and proxies.
   
-  Every part of the system is both publisher and subscriber and is decoupled with the usage of proxies.
-  
+  Every part of the system communicates with the event pattern using technologies and methods such as JMS,Artemis and webhooks.
+ 
   For more info please refer to  documentation.
   
   Documentation at:
   
     https://github.com/AntonioEmmanuele/Models-Doc_SAD-Project-GGNA
+    
