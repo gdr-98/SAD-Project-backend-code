@@ -2,7 +2,7 @@
 Backend code of LightnigOrder application.
 The name backend is trivial since this is just che code of the "central" system and code for proxies.
 
-# What is LightningOrder?
+## What is LightningOrder?
 
   LightningOrder is an event based application for restaurant managment.
   
