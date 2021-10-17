@@ -1,25 +1,25 @@
 package com.project.ProxyCameriere.ProxyCameriere.ProxyCameriere.JMS;
 
-import com.fasterxml.jackson.databind.ser.Serializers;
 import com.google.gson.Gson;
-import com.project.ProxyCameriere.ProxyCameriere.web.BaseMessage;
-import com.project.ProxyCameriere.ProxyCameriere.web.LoginResponse;
+import com.project.ProxyCameriere.ProxyCameriere.web.baseMessage;
+import com.project.ProxyCameriere.ProxyCameriere.web.loginResponse;
 import com.project.ProxyCameriere.ProxyCameriere.web.Post;
 import com.project.ProxyCameriere.ProxyCameriere.web.Webhook;
+
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.server.LocalServerPort;
+
 import org.springframework.jms.annotation.JmsListener;
-import org.springframework.jms.listener.adapter.ListenerExecutionFailedException;
+
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpServerErrorException;
+
 
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
-import java.net.ConnectException;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Map;
@@ -45,15 +45,13 @@ public class ReceiverJMS implements MessageListener {
         /*
          * Retrieve body of the message sent by ActiveMQ.
          */
-
-        String url;
         String helper;
-        BaseMessage msg_received = new BaseMessage() ;
+        baseMessage msg_received = new baseMessage() ;
         String msg_to_send = "";
         Gson gson=new Gson();
         try {
-             helper= (String) message.getBody(String.class);
-             msg_received=gson.fromJson(helper,BaseMessage.class);
+             helper=  message.getBody(String.class);
+             msg_received=gson.fromJson(helper,baseMessage.class);
              log.info("Returned is " +helper);
              msg_to_send = (String) message.getBody(Object.class);
         } catch (JMSException ex) {
@@ -87,11 +85,11 @@ public class ReceiverJMS implements MessageListener {
                     break;
             //adds a new user and notify
             case "registerNotification":
-                LoginResponse resp=gson.fromJson(msg_to_send,LoginResponse.class);
+                loginResponse resp=gson.fromJson(msg_to_send,loginResponse.class);
                 Webhook.Add_Waiter(resp.user,resp.url);
                 //Now set the url to post
                 resp.proxySource= getProxyAddress()+"/waitersSend";
-                msg_to_send=gson.toJson(resp,LoginResponse.class);
+                msg_to_send=gson.toJson(resp,loginResponse.class);
                 if( Webhook.Waiters.containsKey(msg_received.user)) { //if the name exists
                         log.info("Sending to "+"http://" + Webhook.Waiters.get(msg_received.user));
                         poster.createPost("http://" + Webhook.Waiters.get(msg_received.user) + "/login", msg_to_send);

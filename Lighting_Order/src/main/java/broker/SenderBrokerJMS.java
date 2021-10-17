@@ -12,6 +12,7 @@ import com.google.gson.Gson;
 import UsersData.User;
 import messages.loginRequest;
 import messages.orderNotification;
+import messages.tableRequest;
 @Service("SenderBrokerJMS")
 public class SenderBrokerJMS {
 		
@@ -137,5 +138,21 @@ public class SenderBrokerJMS {
 			loginRequest not=gson.fromJson(message, loginRequest.class);
 			if(this.roleToQueueMap.containsKey(not.result))
 				this.send(this.roleToQueueMap.get(not.result), message);
+    	}
+    	
+    	/*
+    	 *  LA table request è un messaggio particolare
+    	 */
+    	void handleTableRequest(String message) {
+    		Gson gson=new Gson();
+    		tableRequest req= gson.fromJson(message, tableRequest.class);
+    		if(req.proxySource.equals("waitersProxy"))
+    			this.sendWaitersInfo(message);
+    		else if(req.proxySource.equals("acceptanceProxy"))
+    			this.sendAcceptanceInfo(message);
+    		else {
+    			this.sendWaitersInfo(message);
+    			this.sendAcceptanceInfo(message);
+    		}
     	}
 }

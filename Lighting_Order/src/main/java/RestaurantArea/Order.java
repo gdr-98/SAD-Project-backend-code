@@ -572,10 +572,6 @@ public class Order {
 	
 	/**
 	 * @area	returns ordered items with just a specific area
-	 * @status	with this flag it will return only the items inn a specific status, check
-	 * 			ordered item states for more info.
-	 * @priority	priority of the item, if -1 means to search for max prio 
-	 * @status
 	 * @return the json representation of the object
 	 */
 	public String getJSONRepresentationAsCommande(String area) {
@@ -664,6 +660,25 @@ public class Order {
 		}
 		return highestPriority;
 	}
+	
+	public boolean cancel() {
+		boolean check=true;
+		if(this.isCancellable()) {
+			
+			if(associatedTable.isPresent())
+				check=check && associatedTable.get().unregisterOrder(orderID); //unreg from table
+			
+			if(generator.isPresent())
+				check= check && generator.get().unregisterOrder(this); //unreg from user
+			
+			check=check && this.controller.unregisterOrder(this) //unreg from controller
+					&&this.controller.getDB().removeOrderById(orderID); //remove from db
+			return  check;
+		}
+		else
+			return false;
+	}
+	
 	
 	/**
 	 * 

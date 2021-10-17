@@ -65,9 +65,10 @@ public class DispatcherBroker implements BrokerInterface{
 			break;
 		//6
 		case "tableRequest":
-			//Lo possono richiedere enntrambi, saranno poi i proxy a distinguere in base all'userID
+			/*//Lo possono richiedere enntrambi, saranno poi i proxy a distinguere in base all'userID
 			sender.sendAcceptanceInfo(response);
-			sender.sendWaitersInfo(response);
+			sender.sendWaitersInfo(response);*/
+			sender.handleTableRequest(response);
 			break;
 		//7
 		case "freeTableRequest":

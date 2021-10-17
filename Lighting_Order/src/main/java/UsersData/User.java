@@ -110,4 +110,21 @@ public class User {
 		return orders.add(o);
 		
 	}
+	/**
+ 	 * @info : 	utility function that removes an order from the user.
+ 	 * 			No need to check the state since it could always be done.
+ 	 * 			This function is meant to be called only from the order
+ 	 * @return: true if the element is present
+ 	 */
+ 	public  boolean unregisterOrder(Order o) {
+ 	
+ 		for(int i=0;i<this.orders.size();i++) {
+ 			if(this.orders.get(i).getId()==o.getId()) {
+ 				this.orders.remove(i);
+ 				return true;
+ 			}
+ 		}
+ 		
+ 		return false;
+ 	}
 }

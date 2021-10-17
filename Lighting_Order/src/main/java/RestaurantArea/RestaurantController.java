@@ -96,18 +96,23 @@ public class RestaurantController {
 	 * @return empty if the order was found or Option.of(result)
 	 */
 	public Optional<Boolean> cancelOrder(int orderID) {
-
-		for(Order o:this.orders) {
+		
+		/*for(Order o:this.orders) {
 			if(o.isMe(orderID)) {
-				if(o.isCancellable()) {
+				/*if(o.isCancellable()) {
 					this.orders.remove(o);
 					db.removeOrderById(orderID);
 					return Optional.of(true);
 				}
 				else
 					return Optional.of(false);
+				return Optional.of(o.ca)
 			}
-		}
+		}*/
+		Optional<Order> toCancel=this.getOrderById(orderID);
+		if(toCancel.isPresent())
+			return Optional.of(toCancel.get().cancel());
+		
 		return Optional.empty();
 	}
 	
@@ -551,4 +556,11 @@ public class RestaurantController {
  		}
  		return toRet;
  	}
+	
+	/**
+	 * @info utility function that unregisters an order
+	 * @param o order to be unregistered
+	 * @return result of the operation 
+	 */
+	public boolean unregisterOrder(Order o) { return this.orders.remove(o);}
 }

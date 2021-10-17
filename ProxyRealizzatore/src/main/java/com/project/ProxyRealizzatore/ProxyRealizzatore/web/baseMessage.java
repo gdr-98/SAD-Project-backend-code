@@ -1,11 +1,11 @@
-package com.project.ProxyCameriere.ProxyCameriere.web;
+package com.project.ProxyRealizzatore.ProxyRealizzatore.web;
 
-public class BaseMessage {
+public class baseMessage {
     public String user;
     public String proxySource;
     public String messageName;
     public String result;
     public String response;
 
-    public BaseMessage(){}
+    public baseMessage(){}
 }
