@@ -1,3 +1,4 @@
+
 package com.project.ProxyRealizzatore.ProxyRealizzatore.web;
 
 import org.springframework.http.HttpEntity;
@@ -27,3 +28,4 @@ public class Post {
         this.restTemplate.postForObject(uri, entity, String.class);
     }
 }
+

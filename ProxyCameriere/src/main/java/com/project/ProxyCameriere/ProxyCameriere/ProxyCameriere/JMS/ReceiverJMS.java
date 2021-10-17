@@ -1,3 +1,4 @@
+
 package com.project.ProxyCameriere.ProxyCameriere.ProxyCameriere.JMS;
 
 import com.google.gson.Gson;
@@ -109,4 +110,5 @@ public class ReceiverJMS implements MessageListener {
         }
         return address;
     }
+
 }

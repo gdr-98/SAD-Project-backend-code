@@ -1,3 +1,4 @@
+
 package com.project.ProxyRealizzatore.ProxyRealizzatore.web;
 
 import java.util.HashMap;
@@ -16,3 +17,4 @@ public class Webhook{
     }
 
 }
+

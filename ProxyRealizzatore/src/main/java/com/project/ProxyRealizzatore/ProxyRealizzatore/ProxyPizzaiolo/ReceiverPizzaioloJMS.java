@@ -1,3 +1,4 @@
+
 package com.project.ProxyRealizzatore.ProxyRealizzatore.ProxyPizzaiolo;
 
 import com.google.gson.Gson;
@@ -93,4 +94,5 @@ public class ReceiverPizzaioloJMS implements MessageListener {
         }
         return address;
     }
+
 }

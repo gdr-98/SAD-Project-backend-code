@@ -3,20 +3,26 @@ package com.project.ProxyAccoglienza.JMS;
 import com.google.gson.Gson;
 import com.project.ProxyAccoglienza.web.baseMessage;
 import com.project.ProxyAccoglienza.web.loginRequest;
+
+
 import com.project.ProxyAccoglienza.web.Post;
 import com.project.ProxyAccoglienza.web.Webhook;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Value;
+
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Service;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+
 
 
 /*
@@ -35,6 +41,7 @@ public class ReceiverJMS implements MessageListener {
     @Value("${server.port}")
     public String address_port;
 
+
     @JmsListener(destination = "CodaAccoglienzaBroker")
     @Override
     public void onMessage(@NotNull Message message) {
@@ -44,12 +51,14 @@ public class ReceiverJMS implements MessageListener {
 
         String msg_to_send = "";
         String helper ;
+
         baseMessage msg_received = new baseMessage();
         Gson gson = new Gson();
         try {
             helper = (String) message.getBody(String.class);
             msg_received=gson.fromJson(helper, baseMessage.class);
             log.info("Returned is " +helper);
+
             msg_to_send = (String) message.getBody(Object.class);
         } catch (JMSException ex) {
             ex.printStackTrace();
@@ -59,6 +68,7 @@ public class ReceiverJMS implements MessageListener {
         tableRequest,
         freeTableRequest,
         userWaitingForOrdersRequest
+
         registerNotification
          */
 
@@ -80,6 +90,7 @@ public class ReceiverJMS implements MessageListener {
                 if( Webhook.Acceptance.containsKey(msg_received.user)) //if the name exists
                     log.info("Sending to "+"http://" + Webhook.Acceptance.get(msg_received.user));
                     poster.createPost("http://"+ Webhook.Acceptance.get(msg_received.user)+"/login",msg_to_send);
+
                 break;
             default:
                 log.info("Message does not match with any of the expected ones");
@@ -88,6 +99,7 @@ public class ReceiverJMS implements MessageListener {
 
         log.info("Event received: " + msg_received);
     }
+
     private String getProxyAddress(){
         String address="";
         try {
@@ -97,4 +109,5 @@ public class ReceiverJMS implements MessageListener {
         }
         return address;
     }
+
 }

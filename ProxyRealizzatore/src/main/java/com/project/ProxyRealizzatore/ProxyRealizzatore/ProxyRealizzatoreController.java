@@ -1,3 +1,4 @@
+
 package com.project.ProxyRealizzatore.ProxyRealizzatore;
 
 import com.project.ProxyRealizzatore.ProxyRealizzatore.ProxyChef.ReceiverChefJMS;
@@ -25,3 +26,4 @@ public class ProxyRealizzatoreController {
         return new ResponseEntity<>("Event Sent", HttpStatus.OK);
     }
 }
+
