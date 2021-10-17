@@ -5,8 +5,7 @@ import java.util.List;
 import com.google.gson.annotations.Expose;
 
 public class orderToTableGenerationRequest extends baseMessage {
-	public String tableID;
-	public int tableRoomNumber;
+
 	public class orderParameters{
 		@Expose(serialize=true,   deserialize=true)
 		public List<String> itemNames;
@@ -17,5 +16,10 @@ public class orderToTableGenerationRequest extends baseMessage {
 		@Expose(serialize=true,deserialize=true)
 		public List<Integer>  priority;
 	}
-	public  orderParameters orderParams;
+	
+	public String tableId;
+	
+	public int tableRoomNumber;
+
+	public orderParameters orderParams;
 }

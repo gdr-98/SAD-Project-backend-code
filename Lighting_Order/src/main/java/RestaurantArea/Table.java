@@ -128,9 +128,10 @@ public class Table {
 	 * @info	Cancel of orders of the table
 	 */
 	public void clearOrders() {
-		for(Order o :this.orders)
-			controller.cancelOrder(o.getId());
-		orders.clear();
+		
+		for( int i=0;i<this.orders.size();i++) 
+			this.orders.get(i).cancel();
+		
 	}
 	
 	/**
@@ -249,4 +250,22 @@ public class Table {
  	 * @info when obtaining the object  from json we need to re-init the orderslist
  	 */
  	public void initOrders() { this.orders=new ArrayList<>();}
+ 	
+ 	/**
+ 	 * @info : 	utility function that removes an order from the table.
+ 	 * 			No need to check the state since it could always be done.
+ 	 * 			This function is meant to be called only from the order
+ 	 * @return: true if the element is present
+ 	 */
+ 	public  boolean unregisterOrder(int orderID) {
+ 	
+ 		for(int i=0;i<this.orders.size();i++) {
+ 			if(this.orders.get(i).getId()==orderID) {
+ 				this.orders.remove(i);
+ 				return true;
+ 			}
+ 		}
+ 		
+ 		return false;
+ 	}
 }

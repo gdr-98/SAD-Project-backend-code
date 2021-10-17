@@ -16,9 +16,11 @@ import org.springframework.stereotype.Service;
 import MenuAndWareHouseArea.MenuAndGoodsController;
 import MenuAndWareHouseArea.OrderedItem;
 import MenuAndWareHouseArea.OrderedItemState;
+import UsersData.User;
+import UsersData.UsersController;
 
 @Service
-@ComponentScan(basePackages= {"DataAccess"})
+@ComponentScan(basePackages= {"DataAccess","UsersData"})
 public class RestaurantController {
 	
 	public enum returnCodes{
@@ -37,10 +39,12 @@ public class RestaurantController {
 	private List<Order> orders=new ArrayList<>();
 	private RestaurantDAO db;
 	private MenuAndGoodsController menuAndWarehouseController;
+	private UsersController userController;
 	@Autowired
-	public RestaurantController(@Qualifier("psqlRestaurant")RestaurantDAO db,MenuAndGoodsController c) {
+	public RestaurantController(@Qualifier("psqlRestaurant")RestaurantDAO db,MenuAndGoodsController c,UsersController uc) {
 		this.db=db;
 		this.menuAndWarehouseController=c;
+		this.userController=uc;
 		 //retrieves all tables, the tables must ALWAYS be in the system
 		this.initTablesJSON(db.getAllTablesJSON());
 		
@@ -67,7 +71,9 @@ public class RestaurantController {
 	 * @info: utility function, the controller registers to the controller in his costructor
 	 * @param o order to be registered
 	 */
-	public void registerOrder(Order o) { this.orders.add(o);}
+	public void registerOrder(Order o) { 
+		this.orders.add(o);
+	}
 
 	/**
 	 * @return a reference to the DAO
@@ -90,18 +96,23 @@ public class RestaurantController {
 	 * @return empty if the order was found or Option.of(result)
 	 */
 	public Optional<Boolean> cancelOrder(int orderID) {
-
-		for(Order o:this.orders) {
+		
+		/*for(Order o:this.orders) {
 			if(o.isMe(orderID)) {
-				if(o.isCancellable()) {
+				/*if(o.isCancellable()) {
 					this.orders.remove(o);
 					db.removeOrderById(orderID);
 					return Optional.of(true);
 				}
 				else
 					return Optional.of(false);
+				return Optional.of(o.ca)
 			}
-		}
+		}*/
+		Optional<Order> toCancel=this.getOrderById(orderID);
+		if(toCancel.isPresent())
+			return Optional.of(toCancel.get().cancel());
+		
 		return Optional.empty();
 	}
 	
@@ -275,7 +286,7 @@ public class RestaurantController {
 		}
 
 	}
-	
+		
 	/**
 	 * 
 	 * @param itemNames of the order
@@ -283,25 +294,28 @@ public class RestaurantController {
 	 * @param toSub names
 	 * @param priority of the item
 	 * @param userID creator
-	 * @return orderNotCreated or tableNotFound, else the JSONRepresenntationn of the order
+	 * @return orderNotCreated or tableNotFound, else the order Id
 	 */
-	public String generateOrderForTable(List<String>itemNames,List<List<String>> additive,List<List<String>>toSub,
+	public String generateOrderForTableId(List<String>itemNames,List<List<String>> additive,List<List<String>>toSub,
 			
-			List<Integer> priority,String tableID,int tableRoomNumber,Integer userID){
+		List<Integer> priority,String tableID,int tableRoomNumber,Integer userID){
 		String toRet =returnCodes.tableNotFound.name();
 		Optional<Order> newOrder;
-		for(Table t:this.tables) {
-			if(t.isMe(tableID, tableRoomNumber)) {
-				newOrder=t.addOrder(itemNames, additive, toSub, priority, userID);
-				if(newOrder.isEmpty())
-					toRet=returnCodes.orderNotCreated.name();
-				else
-					toRet=newOrder.get().getJSONRepresentation(Optional.empty());
+		Integer id;
+		Optional<Table> helper=this.getTable(tableID, tableRoomNumber);
+		Table t;
+		if(helper.isPresent()) {
+			t=helper.get();
+			newOrder=t.addOrder(itemNames, additive, toSub, priority, userID);
+			if(newOrder.isEmpty())
+				toRet=returnCodes.orderNotCreated.name();
+			else {
+				id=newOrder.get().getId();
+				toRet=id.toString();
 			}
 		}
 		return toRet;
 	}
-	
 	
 	/**
 	 *
@@ -391,19 +405,15 @@ public class RestaurantController {
 	 */
 	public String addItemToOrder(int orderID,List<String>names,List<List<String>> additive,List<List<String>>toSub,
 	List<Integer> priority) {
-		Order toMod=null;
+		Optional<Order>toMod=getOrderById(orderID);
 		boolean check=false;
-		for(Order o:this.orders) {
-			if (o.isMe(orderID))
-				toMod=o;
-		}
-		if(toMod==null) {
+		if(toMod.isEmpty()) {
 			return returnCodes.orderNotFound.name();
 		}
-		check=toMod.addOrderedItems(names, additive, toSub, priority);
+		check=toMod.get().addOrderedItems(names, additive, toSub, priority);
 		if(!check)
 			return	returnCodes.itemsNotAdded.name();
-		return toMod.getJSONRepresentation(Optional.empty());
+		return toMod.get().getJSONRepresentation(Optional.empty());
 	}
 	
 	/**
@@ -413,19 +423,15 @@ public class RestaurantController {
 	 * @return the json representation of the order else the specific error code
 	 */
 	public String deleteItemFromOrder(int orderID,int lineNumber) {
-		Order toMod=null;
+		Optional<Order>toMod=getOrderById(orderID);
 		boolean check=false;
-		for(Order o:this.orders) {
-			if (o.isMe(orderID))
-				toMod=o;
-		}
-		if(toMod==null) {
+		if(toMod.isEmpty()) {
 			return returnCodes.orderNotFound.name();
 		}
-		check=toMod.cancelOrderedItem(lineNumber);
+		check=toMod.get().cancelOrderedItem(lineNumber);
 		if(!check)
 			return	returnCodes.itemNotCanceled.name();
-		return toMod.getJSONRepresentation(Optional.empty());
+		return toMod.get().getJSONRepresentation(Optional.empty());
 		
 	}
 	
@@ -447,14 +453,12 @@ public class RestaurantController {
 			int priority) {
 		Order toMod=null;		
 		List<String> returnStatus=new ArrayList<>();
-		for(Order o:this.orders) {
-			if (o.isMe(orderID))
-				toMod=o;
-		}
-		if(toMod==null) {
+		Optional<Order>find=this.getOrderById(orderID);
+		if(find.isEmpty()) {
 			returnStatus.add(returnCodes.orderNotFound.name());
 		}
 		else {
+			toMod=find.get();
 			Optional<OrderedItemState.StatusCodes> result1=toMod.setAdditiveGoodsForItem(additiveGoods, lineNumber);
 			Optional<OrderedItemState.StatusCodes>result2=toMod.setSubGoodsForItem(subGoods, lineNumber);
 			Optional<OrderedItemState.StatusCodes>result3=toMod.setPriorityForItem(priority, lineNumber);
@@ -478,162 +482,85 @@ public class RestaurantController {
 	 */
 	public String hasItem(int orderID,int itemLineNumber) {
 		String toRet=returnCodes.orderNotFound.name();
-		boolean check=false;
-		int index=0;
-		while(!check && index<this.orders.size()) {
-			if(this.orders.get(index).isMe(orderID)) {
-				check=true;
-				toRet=returnCodes.itemNotFound.name();
-				if(this.orders.get(index).hasItem(itemLineNumber))
-					return returnCodes.itemFound.name();
-			}
-		}
+		Optional<Order> ord=this.getOrderById(orderID);
+		if(ord.isEmpty()) {
+			return toRet;
+		}	
+		//Else assig itemNotFound
+		toRet=returnCodes.itemNotFound.name();
+		//If the item is present assign item found
+		if(ord.get().hasItem(itemLineNumber))
+			toRet=returnCodes.itemFound.name();
 		return toRet;
 	}
 	
+	/**
+	 * 
+	 * @param orderID
+	 * @return true if the order is inn list
+	 */
 	public String harOrder(int orderID) {
-		for(Order o:this.orders) {
-			if(o.isMe(orderID))
-				return returnCodes.orderFound.name();
-		}
+		Optional<Order> order=this.getOrderById(orderID);
+		if(order.isPresent())
+			return returnCodes.orderFound.name();
 		return returnCodes.orderNotFound.name();
 	}
 	
-	/******************************************************************
-	 * 	Every good project has a lot of dead code of previous versions that maybe in a 
-	 * dystopian future will be useful :)
-	 *********************************************************/
-	
-	/** @param additive map item name with additive goods
-	 * @param sub	map item name with sub goods
-	 * @param priority	map item name with his priority
-	 * @return	 list of ordered item generated
-	 */
-	/*
-	public List<OrderedItem> generateItemRaw(	Map<String,List<String>>additive,Map<String,List<String>>sub,
-				Map<String,Integer> priority){ //generate ordered items to add
-
-				List<String> additiveGoods;
-				List<String> subGoods;
-				int prioToSet;
-				Optional<OrderedItem> helper;
-				List<OrderedItem> toRet=new ArrayList<>();
-				for(String menuItemName: additive.keySet()) {
-
-					additiveGoods=additive.get(menuItemName);
-					subGoods=sub.get(menuItemName);
-					prioToSet=priority.get(menuItemName);
-
-					if(subGoods!=null & priority!=null ) { //if the menuItem is present in all lists
-						helper=this.menuAndWarehouseController.generateOrderedItem(menuItemName);
-						if(helper.isPresent()) {  //if menuItem exists
-							System.out.println(helper.get().changeAddGoods(additiveGoods).name());
-							System.out.println(helper.get().changeSubGoods(subGoods).name());
-							helper.get().setPriority(prioToSet);
-							toRet.add(helper.get());
-						}
-						else {} //if menuItem doesn't exist, does nothing
-					}
-				}
-				return toRet;
-	}*/
-
 	/**
-	 * @info Generate an order and associates it with a table
-	 * @return an empty json object if no item created else the json representation of the order.
+	 * @param orderID
+	 * @param itemLineNumber
+	 * @return true if the order has items with  same priority of the input one in the specific status , else false.
+	 * 			returns empty if the order or the item are not in list
 	 */
-	/*
-	public String generateOrderToTable(	List<String>itemNames,List<List<String>> additive,List<List<String>>toSub,
-
-			List<String> priority,String tableID,int tableNumber,Integer userID){
-
-		Optional<Table>t=this.getTable(tableID,tableNumber);
-		String toRet="tableNotFound";
-		Optional<Order>generated;
-		Order newOrder;
-		if(t.isPresent()) {
-			generated=t.get().addOrder(additive, toSub, priority, userID);
-			if(generated.isEmpty())
-				toRet="orderNotGenerated";
-			else {
-				newOrder=generated.get();
-				toRet=newOrder.getJSONRepresentation(Optional.empty());
-				this.orders.add(newOrder);
-			}
+	public Optional<Boolean> orderHasItemsInStatus(int orderID,int itemLineNumber,String status) {
+		Optional<Boolean> toRet=Optional.empty();
+		Optional<Order>order=this.getOrderById(orderID);
+		if(order.isPresent()) {
+			toRet=order.get().hasItemsInStatus(itemLineNumber,status);
 		}
 		return toRet;
-	}*/
+	}
 	/**
-	 * @param json representation of the ordered item
-	 * @return the ordered item associated
+	 * @info  this function is meant to be called from the order to register himself to the user
+	 * @param userID
+	 * @param o
+	 * @return optional of the user if the order was registered
 	 */
-	/*
-	private OrderedItem generateItemFromJSON(String json) {
+	public Optional<User> askForOrderRegistration( String userID,Order o){ 
+		return this.userController.registerOrderToUser(userID, o);
+		
+	}
+	/**
+ 	 * 
+ 	 * @param itemNames of the order
+ 	 * @param additive goods names
+ 	 * @param toSub names
+ 	 * @param priority of the item
+ 	 * @param userID creator
+ 	 * @return orderNotCreated or tableNotFound, else the JSONRepresenntationn of the order
+ 	 */
+	@Deprecated
+ 	public String generateOrderForTable(List<String>itemNames,List<List<String>> additive,List<List<String>>toSub,
 
-		JsonObject objToInit =JsonParser.parseString(json).getAsJsonObject();
-		JsonArray additive=objToInit.get("additive").getAsJsonArray();
-		JsonArray sub=objToInit.get("sub").getAsJsonArray();
-		List<String>toAdd=new ArrayList<>();
-		List<String >toSub=new ArrayList<>();
-		OrderedItem to_ret=this.menuAndWarehouseController.generateOrderedItem(
-								objToInit.get("item").getAsString()).get();
-		to_ret.setLineNumber(objToInit.get("lineNumber").getAsInt());
-		for(int i=0;i<additive.size();i++) {
-			toAdd.add(additive.get(i).getAsString());
-		}
-		for(int i=0;i<sub.size();i++) {
-			toSub.add(sub.get(i).getAsString());
-		}
-		to_ret.setStateFromString(objToInit.get("actualState").getAsString());
-		to_ret.changeAddGoods(toAdd);
-		to_ret.changeSubGoods(toSub);
-		return to_ret;
-	}*/
+ 			List<Integer> priority,String tableID,int tableRoomNumber,Integer userID){
+ 		String toRet =returnCodes.tableNotFound.name();
+ 		Optional<Order> newOrder;
+ 		for(Table t:this.tables) {
+ 			if(t.isMe(tableID, tableRoomNumber)) {
+ 				newOrder=t.addOrder(itemNames, additive, toSub, priority, userID);
+ 				if(newOrder.isEmpty())
+ 					toRet=returnCodes.orderNotCreated.name();
+ 				else
+ 					toRet=newOrder.get().getJSONRepresentation(Optional.empty());
+ 			}
+ 		}
+ 		return toRet;
+ 	}
 	
 	/**
-	 *
-	 * @info Generate an order from his json representation. THIS FUNCTION MUST BE CALLED WITH ALL
-	 * 			TABLES IN THE SYSTEM
-	 * @return Order created
+	 * @info utility function that unregisters an order
+	 * @param o order to be unregistered
+	 * @return result of the operation 
 	 */
-	/*
-	public Order createOrderFromJSON(String json) {
-		Gson gson = new GsonBuilder()
-				  .excludeFieldsWithoutExposeAnnotation()
-				  .create();
-		JsonObject toInit=JsonParser.parseString(json).getAsJsonObject();
-		JsonArray array=toInit.get("orderedItems").getAsJsonArray();
-		//create the order
-		Order o=gson.fromJson(toInit,Order.class);//Inits the object
-		//gets the associated table,WE ARE SUPPOSING THE TABLES ARE IN THE SYSTEM
-		Optional<Table> associated=this.getTable(toInit.get("tableID").getAsString(),
-				toInit.get("tableRoomNumber").getAsInt());
-		o.setTable(associated);
-		//associated.get().addOrder(o); //Register the order to the table
-		associated.get().addOrderRaw(o); //Just in case of inconsistency in the db
-		o.initItems();
-		//Now add all the ordered items..
-		for(int i=0;i<array.size();i++) {
-
-			o.addOrdedItem(generateItemFromJSON(
-							array.get(i).toString()
-							));
-		}
-		return o;
-	}*/
-	
-	/**
-	 * @info : Private function , generate orders list.
-	 *			Orders and tables must always be in the system.
-	 */
-	/*private  void initOrdersJSON(String ordersJsonArray){
-
-		JsonArray array=JsonParser.parseString(db.getAllOrdersJSON()).getAsJsonArray();
-		for(int i=0;i<array.size();i++) {
-			this.orders.add(
-					createOrderFromJSON(array.get(i).toString())
-					);
-		}
-	}*/
-
+	public boolean unregisterOrder(Order o) { return this.orders.remove(o);}
 }

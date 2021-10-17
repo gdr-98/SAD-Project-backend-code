@@ -1,0 +1,412 @@
+{
+	"info": {
+		"_postman_id": "0133f650-312c-4f53-b51d-cf670cafeaf8",
+		"name": "esame da mostrare",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "queryMenu1",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"user\":\"1\",\"proxySource\":\"\",\"messageName\":\"menuRequest\",\"areaVisualization\":false,\"areaMenu\":\"\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8082/waitersSend",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"waitersSend"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:8081/send",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"user\":\"1\",\"proxySource\":\"\",\"messageName\":\"menuRequest\",\"areaVisualization\":true,\"areaMenu\":\"Forno\"}"
+				},
+				"url": {
+					"raw": "localhost:8082/waitersSend",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"waitersSend"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "orderCreation",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"user\":\"1\",\"messageName\":\"orderToTableGenerationRequest\",\"tableId\":\"3\",\"tableRoomNumber\":1,\"orderParams\":{\"itemNames\":[\"Margherita\"],\"addGoods\":[[]],\"subGoods\":[[]],\"priority\":[1]}}"
+				},
+				"url": {
+					"raw": "localhost:8082/waitersSend",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"waitersSend"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "orderCreation2",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"user\":\"1\",\"messageName\":\"orderToTableGenerationRequest\",\"tableId\":\"3\",\"tableRoomNumber\":1,\"orderParams\":{\"itemNames\":[\"Margherita\",\"Patate Fritte\"],\"addGoods\":[[],[]],\"subGoods\":[[],[]],\"priority\":[1,2]}}"
+				},
+				"url": {
+					"raw": "localhost:8082/waitersSend",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"waitersSend"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "orderCreation3",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"user\":\"1\",\"messageName\":\"orderToTableGenerationRequest\",\"tableId\":\"3\",\"tableRoomNumber\":1,\"orderParams\":{\"itemNames\":[\"Margherita\",\"Patate Fritte\"],\"addGoods\":[[],[]],\"subGoods\":[[],[]],\"priority\":[2,1]}}"
+				},
+				"url": {
+					"raw": "localhost:8082/waitersSend",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"waitersSend"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "orderCreation3 Copy",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"user\":\"1\",\"messageName\":\"orderToTableGenerationRequest\",\"tableId\":\"3\",\"tableRoomNumber\":1,\"orderParams\":{\"itemNames\":[\"Margherita\",\"Patate Fritte\",\"Napoletana\"],\"addGoods\":[[],[],[]],\"subGoods\":[[],[],[]],\"priority\":[1,2,2]}}"
+				},
+				"url": {
+					"raw": "localhost:8082/waitersSend",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"waitersSend"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "RichiestaFornoMenu",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"user\":\"1\",\"messageName\":\"menuRequest\",\"areaVisualization\":true,\"areaMenu\":\"Forno\"}"
+				},
+				"url": {
+					"raw": "localhost:8082/waitersSend",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"waitersSend"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "richiestaTavoli",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"user\":1,\"proxySource\":\"waitersProxy\",\"messageName\":\"tableRequest\",\"forRoom\":false,\"roomNumber\":0,\"showItemsInArea\":false,\"orderArea\":\"\"}"
+				},
+				"url": {
+					"raw": "localhost:8082/waitersSend",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"waitersSend"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "freeTable",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"user\":\"1\",\"messageName\":\"freeTableRequest\",\"tableID\":\"3\",\"tableRoomNumber\":1}"
+				},
+				"url": {
+					"raw": "http://localhost:8081/acceptanceSend",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"acceptanceSend"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "orderRequest",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"user\":\"2\",\"proxySource\":\"\",\"messageName\":\"orderRequest\",\"areaVisualization\":true,\"area\":\"Forno\"}"
+				},
+				"url": {
+					"raw": "localhost:8083/makerSend",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"makerSend"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "itemComplete",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"user\":\"2\",\"messageName\":\"itemCompleteRequest\",\"orderID\":6,\"itemLineNumber\":2}"
+				},
+				"url": {
+					"raw": "localhost:8083/makerSend",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"makerSend"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "itemComplete2",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"user\":\"2\",\"messageName\":\"itemCompleteRequest\",\"orderID\":3,\"itemLineNumber\":1}"
+				},
+				"url": {
+					"raw": "localhost:8083/makerSend",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"makerSend"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "itemWorkingRequest",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"user\":\"2\",\"messageName\":\"itemWorkingRequest\",\"orderID\":2,\"itemLineNumber\":1}"
+				},
+				"url": {
+					"raw": "localhost:8083/makerSend",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"makerSend"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "cancelOrderedItem",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"user\":\"1\",\"messageName\":\"cancelOrderedItemRequest\",\"orderID\":3,\"itemLineNumber\":3}"
+				},
+				"url": {
+					"raw": "localhost:8082/waitersSend",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"waitersSend"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "orderRequest2",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"user\":\"2\",\"proxySource\":\"\",\"messageName\":\"orderRequest\",\"areaVisualization\":false,\"area\":\"\"}"
+				},
+				"url": {
+					"raw": "localhost:8083/makerSend",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"makerSend"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "putATableInWaitingForOrders",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"user\":\"1\",\"messageName\":\"userWaitingForOrderRequest\",\"tableID\":\"2\",\"tableRoomNumber\":1}"
+				},
+				"url": {
+					"raw": "http://localhost:8081/acceptanceSend",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"acceptanceSend"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CancelOrder",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"user\":\"1\",\"messageName\":\"cancelOrderRequest\",\"orderID\":3}"
+				},
+				"url": {
+					"raw": "localhost:8082/waitersSend",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"waitersSend"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"user\":\"1\" ,\"messageName\":\"loginRequest\",\"url\":\"localhost:696969\"}"
+				},
+				"url": {
+					"raw": "localhost:8085/loginSend",
+					"host": [
+						"localhost"
+					],
+					"port": "8085",
+					"path": [
+						"loginSend"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

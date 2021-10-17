@@ -22,18 +22,23 @@ import DataAccess.MenuDAOPSQL;
 import DataAccess.RestaurantDAOPSQL;
 import MenuAndWareHouseArea.MenuAndGoodsController;
 import MenuAndWareHouseArea.OrderedItem;
-
+import UsersData.UsersController;
+@SuppressWarnings("deprecation")
 class controllerTests {
 	private MenuAndGoodsController controllerMenu;
 	private RestaurantController controllerRestaurant;
 	private MenuDAOPSQL dbMenu;
 	private RestaurantDAOPSQL dbRestaurant;
+	private UsersController uc;
 	@BeforeEach
 	void setup() {
 		this.dbRestaurant=new RestaurantDAOPSQL();
 		this.dbMenu=new  MenuDAOPSQL();
 		this.controllerMenu=new MenuAndGoodsController(this.dbMenu);
-		this.controllerRestaurant=new RestaurantController(this.dbRestaurant,this.controllerMenu);
+		
+		this.uc=new UsersController();
+		this.controllerRestaurant=new RestaurantController(this.dbRestaurant,this.controllerMenu,this.uc);
+		
 	}
 	
 	@AfterEach
@@ -282,7 +287,7 @@ class controllerTests {
 		String result=controllerRestaurant.generateOrderForTable(names,additive,toSub,priority,"3",1,1);
 		
 		
-		String newOrder=dbRestaurant.getOrderById(this.dbRestaurant.findNextOrderID()-1);
+		String newOrder=dbRestaurant.getOrderByIdJSON(this.dbRestaurant.findNextOrderID()-1);
 		//System.out.println(newOrder);
 		assertEquals(newOrder,this.controllerRestaurant.getLastOrderJSON());
 	
@@ -315,7 +320,7 @@ class controllerTests {
 		String result=controllerRestaurant.generateOrderForTable(names,additive,toSub,priority,"2",1,1);
 		
 		System.out.println(result);
-		String newOrder=dbRestaurant.getOrderById(this.dbRestaurant.findNextOrderID()-1);
+		String newOrder=dbRestaurant.getOrderByIdJSON(this.dbRestaurant.findNextOrderID()-1);
 		
 		assertEquals(newOrder,this.controllerRestaurant.getLastOrderJSON());
 	
@@ -347,7 +352,7 @@ class controllerTests {
 		String result=controllerRestaurant.generateOrderForTable(names,additive,toSub,priority,"1",2,1);
 		
 		System.out.println(result);
-		String newOrder=dbRestaurant.getOrderById(this.dbRestaurant.findNextOrderID()-1);
+		String newOrder=dbRestaurant.getOrderByIdJSON(this.dbRestaurant.findNextOrderID()-1);
 		
 		assertEquals(newOrder,this.controllerRestaurant.getLastOrderJSON());
 	
@@ -438,7 +443,7 @@ class controllerTests {
 		System.out.println("NUOVO"+toRet);
 		
 		Order o=controllerRestaurant.getLastOrder().get();
-		String toRet2=dbRestaurant.getOrderById(o.getId());
+		String toRet2=dbRestaurant.getOrderByIdJSON(o.getId());
 		assertEquals(toRet,o.getJSONRepresentation(Optional.empty()));
 		assertEquals(toRet2,o.getJSONRepresentation(Optional.empty()));
 		
@@ -499,7 +504,7 @@ class controllerTests {
 		String order=controllerRestaurant.generateOrderForTable(prodotti, toAdd, toSub, priority, "2", 1, 1);
 		Order o=controllerRestaurant.getLastOrder().get();
 		assertEquals(o.getJSONRepresentation(Optional.empty()),order);
-		assertEquals(o.getJSONRepresentation(Optional.empty()),dbRestaurant.getOrderById(dbRestaurant.findNextOrderID()-1));
+		assertEquals(o.getJSONRepresentation(Optional.empty()),dbRestaurant.getOrderByIdJSON(dbRestaurant.findNextOrderID()-1));
 		
 		
 		//Check the items....
@@ -516,7 +521,7 @@ class controllerTests {
 		
 		
 		assertEquals(o.getJSONRepresentation(Optional.empty()),order);
-		assertEquals(o.getJSONRepresentation(Optional.empty()),dbRestaurant.getOrderById(dbRestaurant.findNextOrderID()-1));
+		assertEquals(o.getJSONRepresentation(Optional.empty()),dbRestaurant.getOrderByIdJSON(dbRestaurant.findNextOrderID()-1));
 		System.out.println("After"+order);
 		
 		//Check the items....
@@ -533,7 +538,7 @@ class controllerTests {
 				toAdd, toSub, priority);
 		
 		assertEquals(o.getJSONRepresentation(Optional.empty()),order);
-		assertEquals(o.getJSONRepresentation(Optional.empty()),dbRestaurant.getOrderById(dbRestaurant.findNextOrderID()-1));
+		assertEquals(o.getJSONRepresentation(Optional.empty()),dbRestaurant.getOrderByIdJSON(dbRestaurant.findNextOrderID()-1));
 	
 		
 		controllerRestaurant.itemInWorking(o.getId(), 2);
@@ -599,7 +604,7 @@ class controllerTests {
 		String order=controllerRestaurant.generateOrderForTable(prodotti, toAdd, toSub, priority, "2", 1, 1);
 		Order o=controllerRestaurant.getLastOrder().get();
 		assertEquals(o.getJSONRepresentation(Optional.empty()),order);
-		assertEquals(o.getJSONRepresentation(Optional.empty()),dbRestaurant.getOrderById(dbRestaurant.findNextOrderID()-1));
+		assertEquals(o.getJSONRepresentation(Optional.empty()),dbRestaurant.getOrderByIdJSON(dbRestaurant.findNextOrderID()-1));
 		
 		additivi.add("G001"); //Origano
 		additivi.add("G002"); //aglio

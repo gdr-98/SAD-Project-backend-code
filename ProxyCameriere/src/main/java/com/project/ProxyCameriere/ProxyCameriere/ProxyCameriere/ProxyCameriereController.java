@@ -1,11 +1,9 @@
+
 package com.project.ProxyCameriere.ProxyCameriere.ProxyCameriere;
 
 
-import com.google.gson.Gson;
 import com.project.ProxyCameriere.ProxyCameriere.ProxyCameriere.JMS.ReceiverJMS;
 import com.project.ProxyCameriere.ProxyCameriere.ProxyCameriere.JMS.SenderJMS;
-import com.project.ProxyCameriere.ProxyCameriere.ProxyCameriere.JMS.LoginReceiverJMS;
-import com.project.ProxyCameriere.ProxyCameriere.web.BaseMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +26,6 @@ public class ProxyCameriereController {
 
     @Autowired
     private SenderJMS sender;
-
-    @Autowired
-    private LoginReceiverJMS lreceiver;
 
     private static final String name="waitersProxy";
     private final Logger log = LoggerFactory.getLogger(ProxyCameriereController.class);

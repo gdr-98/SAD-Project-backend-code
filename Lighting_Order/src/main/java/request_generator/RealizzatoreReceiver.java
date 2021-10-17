@@ -18,11 +18,12 @@ public class RealizzatoreReceiver implements MessageListener {
     
     String received;
     
-    @JmsListener(destination = "CodaRealizzatore")
+    @JmsListener(destination = "CodaRealizzatori")
     @Override
     public void onMessage(Message message) {
         try {
             received = (String) message.getBody(String.class);
+            //System.out.println(received);
             dispatcherInfo.callerFactory(received);
             
         } catch (JMSException ex) {

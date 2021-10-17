@@ -20,7 +20,11 @@ public class SalaReceiver implements MessageListener {
     public void onMessage(Message message) {
         try {
             received = (String) message.getBody(String.class);
-            dispatcherInfo.callerFactory(received);
+           /* System.out.println(received);
+        	Gson gson=new Gson();
+        	
+        	baseMessage rec=gson.fromJson(received, baseMessage.class);	*/
+           dispatcherInfo.callerFactory(received);
         } catch (JMSException ex) {
             ex.printStackTrace();
         }

@@ -21,9 +21,11 @@ public class RestaurantDAOPSQL implements RestaurantDAO {
 	private JdbcTemplate database;
 	
 	public static final String DRIVER = "org.postgresql.Driver";
-    public static final String JDBC_URL = "jdbc:postgresql://localhost:5432/postgres";
+
+    public static final String JDBC_URL = "jdbc:postgresql://localhost:5432/lightningOrder";
+
     public static final String USERNAME = "postgres";
-    public static final String PASSWORD = "porcodio";
+    public static final String PASSWORD = "postgre";
     
     public RestaurantDAOPSQL() {
     	DriverManagerDataSource dataSource = new DriverManagerDataSource();
@@ -166,6 +168,7 @@ public class RestaurantDAOPSQL implements RestaurantDAO {
 									));
 				}
 				temp.put("orderedItems", (Object) ordered_item_json);
+				temp.put("userID", record.get("dipendente_id").toString());
 				to_return.put(temp);
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
@@ -242,7 +245,7 @@ public class RestaurantDAOPSQL implements RestaurantDAO {
 	 *	lineNumber="LineNumberValue"
 	 */
 	@Override
-	public boolean updateOrderedItem(String orderedItemJsonRepresentation, int order_id) {
+	public boolean updateOrderedItemByJSON(String orderedItemJsonRepresentation, int order_id) {
 		JSONObject orderitem_json;
 		try {
 			orderitem_json = new JSONObject(orderedItemJsonRepresentation);
@@ -264,7 +267,7 @@ public class RestaurantDAOPSQL implements RestaurantDAO {
 
 	
 	@Override
-	public boolean addOrderedItem(String orderedItemJsonRepresentation, int order_id) {
+	public boolean addOrderedItemByJSON(String orderedItemJsonRepresentation, int order_id) {
 		boolean to_return = false;
 		try {
 			JSONObject temp = new JSONObject(orderedItemJsonRepresentation);
@@ -358,7 +361,7 @@ public class RestaurantDAOPSQL implements RestaurantDAO {
 			//	System.out.println("ORDINE INSERITO");
 				JSONArray temp = order_json.getJSONArray("orderedItems");
 				for(int i=0; i<temp.length(); i++) {
-					addOrderedItem(temp.getJSONObject(i).toString(), order_json.getInt("orderID"));
+					addOrderedItemByJSON(temp.getJSONObject(i).toString(), order_json.getInt("orderID"));
 				}
 				return true;
 			} else
@@ -391,7 +394,7 @@ public class RestaurantDAOPSQL implements RestaurantDAO {
 	 *	"orderedItems" :[OrderedItemJsonRappresentation1,...]
 	 */
 	@Override
-	public String getOrderById(int orderID) {
+	public String getOrderByIdJSON(int orderID) {
 		String toReturn =null;
 		String query="SELECT * FROM \"Restaurant\".\"Ordine\""+ " WHERE + id='"+orderID+"'";
 		List<Map<String,Object>> results = database.queryForList(query);
@@ -405,6 +408,8 @@ public class RestaurantDAOPSQL implements RestaurantDAO {
 			order.addProperty("completedItemNumber", (Integer)results.get(0).get("item_completed"));
 			order.addProperty("tableRoomNumber",(Integer)results.get(0).get("tavolo_room") );
 			order.addProperty("tableID",results.get(0).get("tavolo_id").toString() );
+			order.addProperty("userID", results.get(0).get("dipendente_id").toString());
+			//temp.put("userID", record.get("dipendente_id").toString());
 			//Generiamo gli ordered items
 			//Prendo tutti gli item
 			query = "SELECT * FROM \"Restaurant\".\"ProdottoOrdinato\" WHERE ordine_id = '"+results.get(0).get("id").toString()+"'";
@@ -438,7 +443,7 @@ public class RestaurantDAOPSQL implements RestaurantDAO {
 		JsonArray toRet=new JsonArray();
 		String helper;
 		for(Map<String,Object> o:results) {
-			helper=getOrderById(Integer.valueOf(o.get("id").toString()));
+			helper=getOrderByIdJSON(Integer.valueOf(o.get("id").toString()));
 			toRet.add(JsonParser.parseString(helper).getAsJsonObject());
 	 
 		}

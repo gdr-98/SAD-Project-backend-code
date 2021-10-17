@@ -17,9 +17,9 @@ public class UserDAOPSQL implements UsersDAO {
 	private JdbcTemplate database;
 	
 	public static final String DRIVER = "org.postgresql.Driver";
-    public static final String JDBC_URL = "jdbc:postgresql://localhost:5432/lightingOrder";
+    public static final String JDBC_URL = "jdbc:postgresql://localhost:5432/lightningOrder";
     public static final String USERNAME = "postgres";
-    public static final String PASSWORD = "porcodio";
+    public static final String PASSWORD = "postgre";
 	
 	public UserDAOPSQL() {
 		DriverManagerDataSource dataSource = new DriverManagerDataSource();
