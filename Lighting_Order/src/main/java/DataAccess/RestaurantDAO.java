@@ -14,9 +14,9 @@ public interface RestaurantDAO {
 	//Updates an order by using his json representation.
 	public boolean updateOrderByJSON(String orderJsonRepresentation);
 	
-	public boolean updateOrderedItem(String orderedItemJsonRepresentation, int order_id);
+	public boolean updateOrderedItemByJSON(String orderedItemJsonRepresentation, int order_id);
 	
-	public boolean addOrderedItem(String orderedItemJsonRepresentation, int order_id);
+	public boolean addOrderedItemByJSON(String orderedItemJsonRepresentation, int order_id);
 	
 	public boolean removeOrderedItem(int orderedItemID, int orderedItemLineNumber);
 	
@@ -28,6 +28,6 @@ public interface RestaurantDAO {
 	
 	public boolean removeOrderById(int order_id);
 	
-	public String getOrderById(int orderID);
+	public String getOrderByIdJSON(int orderID);
 	
 }
