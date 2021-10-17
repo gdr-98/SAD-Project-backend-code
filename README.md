@@ -4,7 +4,7 @@ The name backend is trivial since this is just che code of the "central" system 
 
 ## What is LightningOrder?
 
-  **LightningOrder** is an *event based* application for restaurant managment.
+  **LightningOrder** is a *publish-subscriber* application for restaurant managment.
   
   It is composed of 3 part: an android application, a central system and proxies.
   
