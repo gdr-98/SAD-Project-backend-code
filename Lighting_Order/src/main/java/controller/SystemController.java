@@ -212,7 +212,7 @@ public class SystemController  extends GeneralController implements controllerIf
 	 * 				}
 	 * 	response:	{
 	 * 					request
-	 * 					result: "roleFailed/roleOk
+	 * 					result: "roleFailed/roleOk"
 	 * 					response:tableJsonRepresentation
 	 * 				}
 	 */

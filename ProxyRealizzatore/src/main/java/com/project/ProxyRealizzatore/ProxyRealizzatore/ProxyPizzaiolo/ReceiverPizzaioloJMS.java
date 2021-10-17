@@ -58,7 +58,7 @@ public class ReceiverPizzaioloJMS implements MessageListener {
 
             case "itemCompleteRequest": case "itemWorkingRequest": case "orderRequest":
                 if( Webhook.Pizza_maker.containsKey(msg_received.user)) //if the name exists
-                    poster.createPost("http://"+ Webhook.Pizza_maker.get(msg_received.user)+"/notification",msg_to_send);
+                    poster.createPost("http://"+ Webhook.Pizza_maker.get(msg_received.user)+"/request",msg_to_send);
                 break;
             case "orderNotification":
                 for (Map.Entry<String, String> me : Webhook.Pizza_maker.entrySet())
@@ -72,17 +72,18 @@ public class ReceiverPizzaioloJMS implements MessageListener {
                    //Add user url
                    log.info("Added user "+resp.user+"with url"+resp.url);
                    //NNow set the url to post
-                   resp.url= getPostAddress()+"/makerSend";
+                   resp.proxySource= getProxyAddress()+"/makerSend";
                    msg_to_send=gson.toJson(resp,LoginResponse.class);
                     if( Webhook.Pizza_maker.containsKey(msg_received.user)) //if the name exists
-                        poster.createPost("http://"+ Webhook.Pizza_maker.get(msg_received.user)+"/notification",msg_to_send);
+                        log.info("Sending to "+"http:// " + Webhook.Pizza_maker.get(msg_received.user));
+                        poster.createPost("http://"+ Webhook.Pizza_maker.get(msg_received.user)+"/login",msg_to_send);
                    break;
             default:
                 log.info("Message does not match with any of the expected ones");
                 break;
         }
     }
-    private String getPostAddress(){
+    private String getProxyAddress(){
         String address="";
         try {
              address= InetAddress.getLocalHost().getHostAddress()+":"+this.address_port;

@@ -38,6 +38,7 @@ public class ReceiverJMS implements MessageListener {
     private final Logger log = LoggerFactory.getLogger(ReceiverJMS.class);
     @Value("${server.port}")
     public String address_port;
+
     @JmsListener(destination = "CodaCamerieriBroker")
     @Override
     public void onMessage(@NotNull Message message) {
@@ -53,7 +54,7 @@ public class ReceiverJMS implements MessageListener {
         try {
              helper= (String) message.getBody(String.class);
              msg_received=gson.fromJson(helper,BaseMessage.class);
-             log.info("Returned is" +helper);
+             log.info("Returned is " +helper);
              msg_to_send = (String) message.getBody(Object.class);
         } catch (JMSException ex) {
             ex.printStackTrace();
@@ -80,7 +81,7 @@ public class ReceiverJMS implements MessageListener {
             case "menuRequest" : case "cancelOrderedItemRequest" : case "orderToTableGenerationRequest" :
                 case "cancelOrderRequest" : case "tableRequest":
                     if(Webhook.Waiters.containsKey(msg_received.user)) {
-                        poster.createPost("http://" + Webhook.Waiters.get(msg_received.user) + "/notification", msg_to_send);
+                        poster.createPost("http://" + Webhook.Waiters.get(msg_received.user) + "/request", msg_to_send);
                         log.info(msg_to_send);
                     }
                     break;
@@ -88,13 +89,12 @@ public class ReceiverJMS implements MessageListener {
             case "registerNotification":
                 LoginResponse resp=gson.fromJson(msg_to_send,LoginResponse.class);
                 Webhook.Add_Waiter(resp.user,resp.url);
-                //NNow set the url to post
-                resp.url= getPostAddress()+"/waitersSend";
+                //Now set the url to post
+                resp.proxySource= getProxyAddress()+"/waitersSend";
                 msg_to_send=gson.toJson(resp,LoginResponse.class);
                 if( Webhook.Waiters.containsKey(msg_received.user)) { //if the name exists
-
-                        log.info("Sending to"+"http://" + Webhook.Waiters.get(msg_received.user));
-                        poster.createPost("http://" + Webhook.Waiters.get(msg_received.user) + "/notification", msg_to_send);
+                        log.info("Sending to "+"http://" + Webhook.Waiters.get(msg_received.user));
+                        poster.createPost("http://" + Webhook.Waiters.get(msg_received.user) + "/login", msg_to_send);
                   }
                 break;
             default :
@@ -102,7 +102,7 @@ public class ReceiverJMS implements MessageListener {
                 break;
         }
     }
-    private String getPostAddress(){
+    private String getProxyAddress(){
         String address="";
         try {
             address= InetAddress.getLocalHost().getHostAddress()+":"+this.address_port;

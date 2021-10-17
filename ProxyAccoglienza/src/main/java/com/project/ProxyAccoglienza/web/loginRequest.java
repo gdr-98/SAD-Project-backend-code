@@ -1,5 +1,5 @@
 package com.project.ProxyAccoglienza.web;
 
-public class LoginResponse extends BaseMessage{
+public class loginRequest extends baseMessage {
         public String url;
 }
