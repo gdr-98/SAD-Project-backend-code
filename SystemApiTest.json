@@ -171,7 +171,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"user\":1,\"messageName\":\"tableRequest\",\"forRoom\":false,\"roomNumber\":0,\"showItemsInArea\":false,\"orderArea\":\"\"}"
+					"raw": "{\"user\":1,\"proxySource\":\"waitersProxy\",\"messageName\":\"tableRequest\",\"forRoom\":false,\"roomNumber\":0,\"showItemsInArea\":false,\"orderArea\":\"\"}"
 				},
 				"url": {
 					"raw": "localhost:8082/waitersSend",
