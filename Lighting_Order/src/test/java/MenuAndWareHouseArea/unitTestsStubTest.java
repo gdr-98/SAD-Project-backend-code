@@ -300,7 +300,7 @@ class unitTestsStubTest {
 	@Test
 	@SuppressWarnings("deprecation")
 	void getMenuTest() {
-		String k=controller.getMenuJSON(false,null);
+		String k=controller.getMenuJSON(false,"");
 		List  <MenuItem> item=controller.getAllItems();
 		List<Goods> goods=controller.getAllGoods();
 		assertEquals(3,item.size());
@@ -323,7 +323,7 @@ class unitTestsStubTest {
 			e.printStackTrace();
 		}
 		
-		controller.getMenuJSON(false,null);	
+		controller.getMenuJSON(false,"");	
 		List  <MenuItem> item2=controller.getAllItems();
 		List<Goods> goods2=controller.getAllGoods();
 		assertEquals(3,item2.size());
