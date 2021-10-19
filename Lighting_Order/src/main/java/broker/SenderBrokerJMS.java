@@ -98,10 +98,23 @@ public class SenderBrokerJMS {
         /**
          * Invia un messaggio di avvenuta operazione per un realizzatore
          */
-    	public void sendMakerInfo(String message) {
-    		this.send(bakeryQueueBroker,message);
-    		this.send(barQueueBroker,message);
-    		this.send(kitchenQueueBroker,message);
+        public void sendMakerInfo(String message) {
+		Gson gson = new Gson();
+		baseMessage msg = gson.fromJson(message, baseMessage.class);
+		if(msg.proxySource.equals("Forno"))
+			this.send(bakeryQueueBroker,message);
+	
+		else if(msg.proxySource.equals("Cucina"))
+			this.send(kitchenQueueBroker,message);
+		
+		else if(msg.proxySource.equals("Bar")) {
+			//this.send(barQueueBroker,message);
+		}
+			
+		else{
+			this.send(bakeryQueueBroker,message);
+			this.send(kitchenQueueBroker,message);
+		}
     	}
     	
     	/**
