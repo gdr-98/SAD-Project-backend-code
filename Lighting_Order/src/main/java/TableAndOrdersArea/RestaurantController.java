@@ -1,4 +1,4 @@
-package RestaurantArea;
+package TableAndOrdersArea;
 import java.util.List;
 import java.util.ArrayList;
 import com.google.gson.JsonArray;

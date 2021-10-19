@@ -334,8 +334,11 @@ public class RestaurantDAOPSQL implements RestaurantDAO {
 	@Override
 	public int findNextOrderID() {
 		String query="SELECT MAX(id) FROM \"Restaurant\".\"Ordine\" ";
-		int max_value=database.queryForObject(query, Integer.class);
-		return max_value+1;
+		Integer max_value=database.queryForObject(query, Integer.class);
+		if(max_value != null)
+			return max_value.intValue() + 1;
+		else // No orders
+			return 1;
 	}
 
 	

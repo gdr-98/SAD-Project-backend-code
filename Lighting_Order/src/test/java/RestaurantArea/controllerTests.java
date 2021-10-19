@@ -22,6 +22,8 @@ import DataAccess.MenuDAOPSQL;
 import DataAccess.RestaurantDAOPSQL;
 import MenuAndWareHouseArea.MenuAndGoodsController;
 import MenuAndWareHouseArea.OrderedItem;
+import TableAndOrdersArea.Order;
+import TableAndOrdersArea.RestaurantController;
 import UsersData.UsersController;
 @SuppressWarnings("deprecation")
 class controllerTests {

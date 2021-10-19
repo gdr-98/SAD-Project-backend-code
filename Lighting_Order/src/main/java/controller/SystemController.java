@@ -2,10 +2,10 @@ package controller;
 
 import MenuAndWareHouseArea.MenuAndGoodsController;
 import MenuAndWareHouseArea.OrderedItemState;
-import RestaurantArea.Order;
-import RestaurantArea.RestaurantController;
-import RestaurantArea.TableState;
-import RestaurantArea.RestaurantController.returnCodes;
+import TableAndOrdersArea.Order;
+import TableAndOrdersArea.RestaurantController;
+import TableAndOrdersArea.TableState;
+import TableAndOrdersArea.RestaurantController.returnCodes;
 import UsersData.UsersController;
 import messages.cancelOrderRequest;
 import messages.itemOpRequest;
