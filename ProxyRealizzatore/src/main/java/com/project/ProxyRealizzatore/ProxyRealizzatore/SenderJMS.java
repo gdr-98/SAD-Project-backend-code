@@ -1,3 +1,4 @@
+
 package com.project.ProxyRealizzatore.ProxyRealizzatore;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,4 +17,5 @@ public class SenderJMS {
     public void sendMessage (String order) {
         JmsTemp.convertAndSend(JmsQueue, order);
     }
+
 }

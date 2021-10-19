@@ -1,3 +1,4 @@
+
 package com.project.ProxyRealizzatore.ProxyRealizzatore.ProxyChef;
 
 import com.google.gson.Gson;
@@ -91,4 +92,6 @@ public class ReceiverChefJMS implements MessageListener {
         }
         return address;
     }
+
 }
+
