@@ -61,7 +61,7 @@ public class ReceiverChefJMS implements MessageListener {
                     poster.createPost("http://"+ Webhook.Chef.get(msg_received.user)+"/request",msg_to_send);
                 break;
             case "orderNotification":
-            for (Map.Entry<String, String> me : Webhook.Pizza_maker.entrySet())
+            for (Map.Entry<String, String> me : Webhook.Chef.entrySet())
                 poster.createPost("http://"+ me.getValue()+"/notification",msg_to_send);
             break;
             //adds a new user and notify
