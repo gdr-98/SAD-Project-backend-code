@@ -10,7 +10,7 @@ import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 import DataAccess.UserDAOPSQL;
-import RestaurantArea.Order;
+import TableAndOrdersArea.Order;
 @Service
 public class UsersController {
 	

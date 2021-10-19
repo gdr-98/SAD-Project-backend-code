@@ -13,6 +13,8 @@ import UsersData.User;
 import messages.loginRequest;
 import messages.orderNotification;
 import messages.tableRequest;
+import messages.baseMessage;
+
 @Service("SenderBrokerJMS")
 public class SenderBrokerJMS {
 		

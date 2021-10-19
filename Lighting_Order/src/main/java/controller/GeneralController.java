@@ -2,7 +2,7 @@ package controller;
 
 
 import MenuAndWareHouseArea.MenuAndGoodsController;
-import RestaurantArea.RestaurantController;
+import TableAndOrdersArea.RestaurantController;
 import UsersData.UsersController;
 
 public class GeneralController {
